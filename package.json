@@ -27,7 +27,8 @@
 			  "extensions": [
 				".vhd",
 				".VHD"
-			  ]        
+			  ],
+			  "configuration": "./language-configuration.json"   
 			}
 		],
 		"configuration": {
