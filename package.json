@@ -1,17 +1,16 @@
 {
-	"name": "rust-hdl-lspclient",
-	"description": "LSP Client for Rust HDL",
+	"name": "vira-hdl",
+	"description": "VHDL IDE",
 	"author": "Henrik Bohlin",
-	"license": "MIT",
+	"license": "SEE LICENSE IN LICENCE",
 	"version": "0.0.1",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/bochlin"
+		"url": "https://github.com/Bochlin/rust_hdl_vscode"
 	},
-	"publisher": "bochlin",
 	"categories": [],
 	"keywords": [
-		"multi-root ready"
+		"VHDL", "vhdl", "ide", "vhdl_ls"
 	],
 	"engines": {
 		"vscode": "^1.23.0"
@@ -33,24 +32,12 @@
 		],
 		"configuration": {
 			"type": "object",
-			"title": "Example configuration",
+			"title": "VHDL",
 			"properties": {
-				"languageServerExample.maxNumberOfProblems": {
-					"scope": "resource",
-					"type": "number",
-					"default": 100,
-					"description": "Controls the maximum number of problems produced by the server."
-				},
-				"languageServerExample.trace.server": {
-					"scope": "window",
+				"viraHdl.languageServerBinary": {
 					"type": "string",
-					"enum": [
-						"off",
-						"messages",
-						"verbose"
-					],
-					"default": "off",
-					"description": "Traces the communication between VS Code and the language server."
+					"enum": ["Extension","SystemPath","Docker"],
+					"description": "Method to find language server executable, Docker option is NOT supported on Windows.\nChanging this option requires a restart of VSCODE"
 				}
 			}
 		}

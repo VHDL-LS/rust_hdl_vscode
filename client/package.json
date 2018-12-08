@@ -1,13 +1,12 @@
 {
-	"name": "lsp-sample-client",
-	"description": "VSCode part of a language server",
-	"author": "Microsoft Corporation",
-	"license": "MIT",
+	"name": "vira-hdl-client",
+	"description": "Vira HDL Language Server Client for Rust HDL",
+	"author": "Henrik Bohlin",
+	"license": "SEE LICENSE IN LICENCE",
 	"version": "0.0.1",
-	"publisher": "vscode",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-extension-samples"
+		"url": "https://github.com/Bochlin/rust_hdl_vscode"
 	},
 	"engines": {
 		"vscode": "^1.23.0"
