@@ -20,16 +20,17 @@
 	],
 	"main": "./client/out/extension",
 	"contributes": {
-		"languages": [
-			{
-			  "id": "vhdl",        
-			  "extensions": [
-				".vhd",
-				".VHD"
-			  ],
+		"languages": [{
+			  "id": "vhdl",
+			  "aliases": ["VHDL"],
+			  "extensions": [".vhd", ".VHD"],
 			  "configuration": "./language-configuration.json"   
-			}
-		],
+		}],
+		"grammars": [{
+				"language": "vhdl",
+				"scopeName": "source.vhdl",
+				"path": "./syntaxes/vhdl.tmLanguage.json"
+		}],
 		"configuration": {
 			"type": "object",
 			"title": "VHDL",
