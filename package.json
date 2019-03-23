@@ -1,8 +1,8 @@
 {
-	"name": "vira-hdl",
-	"description": "VHDL IDE",
+	"name": "rust-hdl-vscode",
+	"description": "Rust HDL IDE",
 	"author": "Henrik Bohlin",
-	"license": "SEE LICENSE IN LICENCE",
+	"license": "SEE LICENSE IN LICENSE",
 	"version": "0.0.1",
 	"repository": {
 		"type": "git",
@@ -10,7 +10,10 @@
 	},
 	"categories": [],
 	"keywords": [
-		"VHDL", "vhdl", "ide", "vhdl_ls"
+		"VHDL",
+		"vhdl",
+		"ide",
+		"vhdl_ls"
 	],
 	"engines": {
 		"vscode": "^1.23.0"
@@ -20,24 +23,37 @@
 	],
 	"main": "./client/out/extension",
 	"contributes": {
-		"languages": [{
-			  "id": "vhdl",
-			  "aliases": ["VHDL"],
-			  "extensions": [".vhd", ".VHD"],
-			  "configuration": "./language-configuration.json"   
-		}],
-		"grammars": [{
+		"languages": [
+			{
+				"id": "vhdl",
+				"aliases": [
+					"VHDL"
+				],
+				"extensions": [
+					".vhd",
+					".VHD"
+				],
+				"configuration": "./language-configuration.json"
+			}
+		],
+		"grammars": [
+			{
 				"language": "vhdl",
 				"scopeName": "source.vhdl",
 				"path": "./syntaxes/vhdl.tmLanguage.json"
-		}],
+			}
+		],
 		"configuration": {
 			"type": "object",
 			"title": "VHDL",
 			"properties": {
-				"viraHdl.languageServerBinary": {
+				"rustHdl.languageServerBinary": {
 					"type": "string",
-					"enum": ["Extension","SystemPath","Docker"],
+					"enum": [
+						"Extension",
+						"SystemPath",
+						"Docker"
+					],
 					"description": "Method to find language server executable, Docker option is NOT supported on Windows.\nChanging this option requires a restart of VSCODE"
 				}
 			}
@@ -45,15 +61,15 @@
 	},
 	"scripts": {
 		"vscode:prepublish": "cd client && npm run update-vscode && cd .. && npm run compile",
-		"compile": "tsc -b",
-		"watch": "tsc -b -w",
-		"postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
+		"compile": "cd client && tsc -b && cd ..",
+		"watch": "cd client && tsc -b -w  && cd ..",
+		"postinstall": "cd client && npm install && cd ..",
 		"test": "sh ./scripts/e2e.sh"
 	},
 	"devDependencies": {
-		"@types/mocha": "^5.2.0",
-		"@types/node": "^8.0.0",
-		"tslint": "^5.11.0",
-		"typescript": "^3.1.3"
+		"@types/mocha": "^5.2.6",
+		"@types/node": "^8.10.45",
+		"tslint": "^5.14.0",
+		"typescript": "^3.3.4000"
 	}
 }

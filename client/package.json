@@ -1,6 +1,6 @@
 {
-	"name": "vira-hdl-client",
-	"description": "Vira HDL Language Server Client for Rust HDL",
+	"name": "rust-hdl-client",
+	"description": "Rust HDL Language Server Client",
 	"author": "Henrik Bohlin",
 	"license": "SEE LICENSE IN LICENCE",
 	"version": "0.0.1",
@@ -9,16 +9,16 @@
 		"url": "https://github.com/Bochlin/rust_hdl_vscode"
 	},
 	"engines": {
-		"vscode": "^1.23.0"
+		"vscode": "^1.32.0"
 	},
 	"scripts": {
 		"update-vscode": "vscode-install",
 		"postinstall": "vscode-install"
 	},
 	"dependencies": {
-		"vscode-languageclient": "^4.1.4"
+		"vscode-languageclient": "^5.2.1"
 	},
 	"devDependencies": {
-		"vscode": "^1.1.21"
+		"vscode": "^1.1.33"
 	}
 }
