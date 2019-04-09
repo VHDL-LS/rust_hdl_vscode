@@ -25,22 +25,17 @@ enum LanguageServerBinary {
     Extension, SystemPath, Docker
 }
 
-const extensionName = 'viraHdl';
+const extensionName = 'rust-hdl-vscode';
 const languageServerBinaryName = 'vhdl_ls';
 
 export async function activate(context: ExtensionContext) {
     
-    let config = vscode.workspace.getConfiguration(extensionName);
-    let lsBinary = config.get('languageServerBinary') as keyof typeof LanguageServerBinary;
+    let languageServerBinary = vscode.workspace.getConfiguration().get('rustHdl.languageServerBinary');
+    let lsBinary = languageServerBinary as keyof typeof LanguageServerBinary;
     const isWindows = process.platform === "win32";
-
-    let useCargo = config.get('enableCargoServerInstall');
 
     let serverCommand  = context.asAbsolutePath(path.join('server', 'vhdl_ls'));
     let serverArgs = [];
-    
-    const cargoCrate = 'vhdl_ls';
-    
     
     if (isWindows && lsBinary == "Docker") {
         window.showWarningMessage("Docker language server not supported on Windows, using system path instead");
