@@ -7,8 +7,6 @@
 import * as path from 'path';
 import vscode = require('vscode');
 import { workspace, ExtensionContext, window } from 'vscode';
-import fs = require('fs');
-// import exec = require('child_process');
 import util = require('util');
 const exec = util.promisify(require('child_process').exec);
 

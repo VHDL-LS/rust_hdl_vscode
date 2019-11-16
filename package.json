@@ -2,6 +2,7 @@
 	"name": "rust-hdl-vscode",
 	"description": "Rust HDL IDE",
 	"author": "Henrik Bohlin",
+	"publisher": "hbohlin",
 	"license": "SEE LICENSE IN LICENSE",
 	"version": "0.0.1",
 	"repository": {
