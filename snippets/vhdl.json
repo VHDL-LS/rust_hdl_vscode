@@ -4,8 +4,6 @@
 	TODO: figure out how to column align with snippets such that when new lines are made for things like when/else
 	      or with select, cursor for next line is aligned with <=
 	TODO: all types from ieee fixed/floating point packages
-	TODO: package generics
-	TODO: configuration
 	? are signal/variable/constant all valid for external names
 */
 
