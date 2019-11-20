@@ -1,12 +1,3 @@
-/*
-	TODO: open VSC enhancement to allow for user selections ($x) within or (${1||}) selection
-	TODO: open VSC bug about or selection for doing nothing still requires the editor insert a space or character
-	TODO: figure out how to column align with snippets such that when new lines are made for things like when/else
-	      or with select, cursor for next line is aligned with <=
-	TODO: all types from ieee fixed/floating point packages
-	? are signal/variable/constant all valid for external names
-*/
-
 {
 
 	"Alias": {
@@ -98,12 +89,12 @@
 	"Case Generate": {
 		"prefix": "casegen",
 		"body": [
-			"${1:<name>} : case ${1:<sel>} generate",
-			"\twhen ${2:<choice_1>} =>",
+			"${1:<name>} : case ${2:<sel>} generate",
+			"\twhen ${3:<choice_1>} =>",
 			"\t\t$0",
 			"",
 			"\twhen others =>",
-			"\t\t${3:null;}",
+			"\t\t${4:null;}",
 			"end generate;"
 		],
 		"description": "case generate instantiation (vhdl 2008)"
@@ -119,7 +110,7 @@
 			"\t);",
 			"end component;"
 		],
-		"description": "component interface"
+		"description": "component declaration"
 	},
 	"Component Instantiation": {
 		"prefix":"componentinst",
@@ -246,7 +237,7 @@
 	"For Generate": {
 		"prefix": "forgen",
 		"body": [
-			"${1:<name>} : for ${2:i} in ${3:<range>} generate",
+			"${1:<loop_gen_Name>} : for ${2:i} in ${3:<range>} generate",
 			"\t$0",
 			"end generate;"
 		],
@@ -300,7 +291,7 @@
 	"If Generate": {
 		"prefix": "ifgen",
 		"body": [
-			"${1:<name>} : if ${2:<conditional>} generate",
+			"${1:<gen_Name>} : if ${2:<conditional>} generate",
 			"\t$0",
 			"end generate;"
 		],
@@ -359,7 +350,7 @@
 			"\t$0",
 			"end loop; -- $1"
 		],
-		"description": "TextIO library declaration"
+		"description": "loop declaration"
 	},
 	"Natural Range": {
 		"prefix": "naturalrange",
@@ -390,7 +381,7 @@
 		"body": [
 			"package body ${1:$TM_FILENAME_BASE} is",
 			"\t$0",
-			"end package;"
+			"end package body;"
 		],
 		"description": "package body interface"
 	},
@@ -437,7 +428,7 @@
 			"begin",
 			"\tif $2 = ${3|'1','0'|} then",
 			"\t\t$0",
-			"\telsif rising_edge($1) then",
+			"\telsif ${4|rising_edge,falling_edge|}($1) then",
 			"\t\t",
 			"\tend if;",
 			"end process;"
@@ -491,37 +482,39 @@
 		],
 		"description": "record declaration"
 	},
-	//"Signal": {
-	//	"prefix": ["dsig", "signaldec"],
-	//	"body": [
-	//		"signal ${1:<name>} : ${2:<type>} := ${3:<default_value>};",
-	//		"$0"
-	//	],
-	//	"description": "signal declaration"
-	//},
 	"Signed": {
 		"prefix": "sign",
-		"body": [ "signed($1 ${2|downto,to|} $3) ${4|:= (others => '0');,;|}$0" ],
+		"body": [ "signed($1 ${2|downto,to|} $3)${4| := (others => '0');,;|}$0" ],
 		"description": "signed declaration"
 	},
-	//"Standard Logic": {
-	//	"prefix": ["std_logic", "sl"],
-	//	"body": [ "std_logic${1| := ,;|}$0" ],
-	//	"description": "std_logic declaration"
-	//},
-	//"Standard ULogic": {
-	//	"prefix": ["std_ulogic", "sul"],
-	//	"body": [ "std_ulogic${1| := ,;|}$0" ],
-	//	"description": "std_ulogic declaration"
-	//},
+	"Standard Logic": {
+		"prefix": "sl",
+		"body": [ "std_logic$0" ],
+		"description": "std_logic"
+	},
+	"Standard ULogic": {
+		"prefix": "sul",
+		"body": [ "std_ulogic$0" ],
+		"description": "std_logic"
+	},
 	"Standard Logic Vector": {
 		"prefix": ["std", "slv"],
-		"body": [ "std_logic_vector($1 ${2|downto,to|} $3) ${4|:= (others => '0');,;|}$0" ],
+		"body": [ "std_logic_vector$0" ],
+		"description": "std_logic_vector"
+	},
+	"Standard Logic Vector Declaration": {
+		"prefix": ["stddec", "slvdec"],
+		"body": [ "std_logic_vector($1 ${2|downto,to|} $3)${4| := (others => '0');,;|}$0" ],
 		"description": "std_logic_vector declaration"
 	},
 	"Standard ULogic Vector": {
 		"prefix": ["stdu", "sulv"],
-		"body": [ "std_ulogic_vector($1 ${2|downto,to|} $3) ${4|:= (others => '0');,;|}$0" ],
+		"body": [ "std_ulogic_vector" ],
+		"description": "std_ulogic_vector"
+	},
+	"Standard ULogic Vector Declaration": {
+		"prefix": ["stdudec", "sulvdec"],
+		"body": [ "std_ulogic_vector($1 ${2|downto,to|} $3)${4| := (others => '0');,;|}$0" ],
 		"description": "std_ulogic_vector declaration"
 	},
 	"Subtype": {
@@ -534,7 +527,7 @@
 	},
 	"Unsigned": {
 		"prefix": "uns",
-		"body": [ "unsigned(${1} ${2|downto,to|} ${3}) ${4|:= (others => '0');,;|}$0" ],
+		"body": [ "unsigned(${1} ${2|downto,to|} ${3})${4| := (others => '0');,;|}$0" ],
 		"description": "unsigned declaration"
 	},
 	"Use": {
@@ -553,14 +546,6 @@
 		],
 		"description": "use clause IEEE standard package (std_logic_1164,std_logic_textio,numeric_std,math_real,math_complex)"
 	},
-	//"Variable": {
-	//	"prefix": "variable",
-	//	"body": [
-	//		"variable ${1:<name>} : ${2:<type>} := ${3:<default_value>};",
-	//		"$0"
-	//	],
-	//	"description": "variable declaration"
-	//},
 	"When": {
 		"prefix": "when",
 		"body": [
