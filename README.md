@@ -15,8 +15,8 @@ can also be loaded from either the system path or using Docker depending
 on the value of the `vhdlLs.languageServerBinary` property.
 - `embedded`: Use the embedded binary.
 - `systemPath`: Load `vhdl_ls` from path.
-- `docker`: Use [docker image](https://hub.docker.com/r/kraigher/vhdl_ls) 
-NOTE: Support for docker is not yet available on Windows  
+- `docker`: Use [docker image](https://hub.docker.com/r/kraigher/vhdl_ls)
+ (NOTE: Support for docker is not yet available on Windows)  
 
 For instructions on compiling the language server, see 
 [Rust HDL](https://github.com/kraigher/rust_hdl)
@@ -35,7 +35,8 @@ Settings in later files overwrites those from previously loaded files.
 **Example vhdl_ls.toml**
 
 ```toml
-# File names are either absolute or relative to the parent folder of the vhdl_ls.toml file and supports glob-style patterns.
+# File names are either absolute or relative to the parent folder of the
+# vhdl_ls.toml file and supports glob-style patterns.
 [libraries]
 lib2.files = [
   'pkg2.vhd',
