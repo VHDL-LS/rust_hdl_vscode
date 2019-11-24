@@ -1,6 +1,7 @@
 {
-	"name": "rust-hdl-vscode",
-	"description": "Rust HDL IDE",
+	"name": "vhdl-ls",
+	"displayName": "VHDL LS",
+	"description": "VHDL Language Server and Support",
 	"author": "Henrik Bohlin",
 	"publisher": "hbohlin",
 	"license": "SEE LICENSE IN LICENSE",
@@ -48,10 +49,10 @@
 			"type": "object",
 			"title": "VHDL",
 			"properties": {
-				"rustHdl.languageServerBinary": {
+				"vhdlLs.languageServerBinary": {
 					"type": "string",
 					"enum": [
-						"Extension",
+						"Embedded",
 						"SystemPath",
 						"Docker"
 					],
@@ -71,6 +72,7 @@
 		"@types/mocha": "^5.2.6",
 		"@types/node": "^8.10.45",
 		"tslint": "^5.20.0",
-		"typescript": "^3.3.4000"
+		"typescript": "^3.3.4000",
+		"vsce": "^1.69.0"
 	}
 }

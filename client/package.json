@@ -1,6 +1,6 @@
 {
-	"name": "rust-hdl-client",
-	"description": "Rust HDL Language Server Client",
+	"name": "vhdl-ls-client",
+	"description": "VHDL LS Client",
 	"author": "Henrik Bohlin",
 	"license": "SEE LICENSE IN LICENCE",
 	"version": "0.0.1",

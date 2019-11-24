@@ -1,6 +1,6 @@
 /* --------------------------------------------------------------------------------------------
 * MIT License
-* Copyright (c) 2018 Henrik Bohlin
+* Copyright (c) 2019 Henrik Bohlin
 * Full license text can be found in /LICENSE or at https://opensource.org/licenses/MIT.
 * ------------------------------------------------------------------------------------------ */
 'use strict';
@@ -20,15 +20,14 @@ import {
 let client: LanguageClient;
 
 enum LanguageServerBinary {
-    Extension, SystemPath, Docker
+    Embedded, SystemPath, Docker
 }
 
-const extensionName = 'rust-hdl-vscode';
 const languageServerBinaryName = 'vhdl_ls';
 
 export async function activate(context: ExtensionContext) {
     
-    let languageServerBinary = vscode.workspace.getConfiguration().get('rustHdl.languageServerBinary');
+    let languageServerBinary = vscode.workspace.getConfiguration().get('vhdlLs.languageServerBinary');
     let lsBinary = languageServerBinary as keyof typeof LanguageServerBinary;
     const isWindows = process.platform === "win32";
 
@@ -48,9 +47,9 @@ export async function activate(context: ExtensionContext) {
             console.log('Using Docker image for language server');
             break;
         
-        case "Extension": 
+        case "Embedded": 
             serverOptions = getServerOptionsExtension(context);
-            console.log('Using language server installed with extension');
+            console.log('Using local language server');
             break;
 
         default: 
@@ -71,8 +70,8 @@ export async function activate(context: ExtensionContext) {
 
     // Create the language client
     client = new LanguageClient(
-        'rustHDL',
-        'Rust HDL (VHDL)',
+        'vhdl_ls',
+        'VHDL LS',
         serverOptions,
         clientOptions
     );
