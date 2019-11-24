@@ -66,9 +66,9 @@
 				"vhdlLs.languageServerBinary": {
 					"type": "string",
 					"enum": [
-						"Embedded",
-						"SystemPath",
-						"Docker"
+						"embedded",
+						"systemPath",
+						"docker"
 					],
 					"description": "Method to find language server executable, Docker option is NOT supported on Windows.\nChanging this option requires a restart of VSCODE"
 				}

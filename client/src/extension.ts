@@ -20,7 +20,7 @@ import {
 let client: LanguageClient;
 
 enum LanguageServerBinary {
-    Embedded, SystemPath, Docker
+    embedded, systemPath, docker
 }
 
 const languageServerBinaryName = 'vhdl_ls';
@@ -34,22 +34,22 @@ export async function activate(context: ExtensionContext) {
     let serverCommand  = context.asAbsolutePath(path.join('server', 'vhdl_ls'));
     let serverArgs = [];
     
-    if (isWindows && lsBinary == "Docker") {
+    if (isWindows && lsBinary == "docker") {
         window.showWarningMessage("Docker language server not supported on Windows, using system path instead");
-        lsBinary = "SystemPath";
+        lsBinary = "systemPath";
     }
     // TODO: If extensions is selected and no vhdl_ls found in /server, use system path
 
     let serverOptions: ServerOptions;
     switch(lsBinary) {
-        case "Docker": 
+        case "docker": 
             serverOptions = await getServerOptionsDocker(); 
-            console.log('Using Docker image for language server');
+            console.log('Using Docker image language server');
             break;
         
-        case "Embedded": 
-            serverOptions = getServerOptionsExtension(context);
-            console.log('Using local language server');
+        case "embedded": 
+            serverOptions = getServerOptionsEmbedded(context);
+            console.log('Using embedded language server');
             break;
 
         default: 
@@ -129,7 +129,7 @@ async function getServerOptionsDocker() {
     return serverOptions;
 }
 
-function getServerOptionsExtension(context: ExtensionContext) {
+function getServerOptionsEmbedded(context: ExtensionContext) {
     let serverCommand = context.asAbsolutePath(path.join('server', languageServerBinaryName));
     let serverOptions: ServerOptions = {
         run: {
