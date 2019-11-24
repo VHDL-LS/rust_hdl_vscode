@@ -10,10 +10,16 @@
 		"type": "git",
 		"url": "https://github.com/Bochlin/rust_hdl_vscode"
 	},
-	"categories": [],
+	"categories": [
+		"Programming Languages",
+		"Snippets"
+	],
 	"keywords": [
 		"VHDL",
 		"vhdl",
+		"language-vhdl",
+		"hdl",
+		"rust_hdl",
 		"ide",
 		"vhdl_ls"
 	],
@@ -29,11 +35,13 @@
 			{
 				"id": "vhdl",
 				"aliases": [
-					"VHDL"
+					"VHDL",
+					"vhdl"
 				],
 				"extensions": [
 					".vhd",
-					".VHD"
+					".vhdl",
+					".vho"
 				],
 				"configuration": "./language-configuration.json"
 			}
@@ -43,6 +51,12 @@
 				"language": "vhdl",
 				"scopeName": "source.vhdl",
 				"path": "./syntaxes/vhdl.tmLanguage.json"
+			}
+		],
+		"snippets": [
+			{
+				"language": "vhdl",
+				"path": "./snippets/vhdl.json"
 			}
 		],
 		"configuration": {
