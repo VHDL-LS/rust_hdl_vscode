@@ -40,7 +40,7 @@ Settings in later files overwrites those from previously loaded files.
 [libraries]
 lib2.files = [
   'pkg2.vhd',
-  'src/**/*.vhd
+  'src/**/*.vhd',
 ]
 lib1.files = [
   'pkg1.vhd',
