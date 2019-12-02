@@ -6,6 +6,7 @@
 	"publisher": "hbohlin",
 	"license": "SEE LICENSE IN LICENSE",
 	"version": "0.0.1",
+	"icon": "icon.png",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Bochlin/rust_hdl_vscode"

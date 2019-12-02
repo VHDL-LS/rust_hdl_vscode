@@ -118,6 +118,7 @@ async function getServerOptionsDocker() {
         '-a', 'stdout',
         '-a', 'stderr',
         '--rm',
+        '-w', mountPath,
         '-v', `${wsPath}:${mountPath}:ro`,
         image,
     ];
