@@ -16,7 +16,7 @@ on the value of the `vhdlls.languageServer` property.
 - `embedded`: Use the embedded binary.
 - `user`: Use path provided by user in `vhdlls.languageServerUserPath` property.
 - `systemPath`: Run `vhdl_ls` from path.
-- `docker`: Use [docker image](https://hub.docker.com/r/kraigher/vhdl_ls) (Syntax checks only)
+- `docker`: Use [docker image](https://hub.docker.com/r/kraigher/vhdl_ls) (Only supports files below workspace root)
 
 NOTE: On Linux, it may be necessary to set the executable permission
 on the vhdl_ls binary.  

@@ -65,7 +65,7 @@
 			"title": "VHDL",
 			"properties": {
 				"vhdlls.languageServer": {
-					"description": "Method to find language server executable. Changing this option requires a restart.",
+					"description": "Language server location. Changing this option requires a restart.",
 					"type": "string",
 					"default": "embedded",
 					"enum": [
@@ -78,11 +78,11 @@
 						"Use language server embedded in extension.",
 						"Use custom path vhdlls.languageServerUserPath",
 						"Run vhdl_ls from system path.",
-						"Use kraigher/vhdl_ls image from Docker Hub"
+						"Use kraigher/vhdl_ls:latest image from Docker Hub"
 					]
 				},
 				"vhdlls.languageServerUserPath": {
-					"description": "Path to vhdl_ls language server executable. Used when vhdlls.languageServer = \"user\"",
+					"description": "Path to vhdl_ls language server executable, used when vhdlls.languageServer = \"user\"",
 					"type": "string"
 				}
 			}
@@ -98,6 +98,7 @@
 	"devDependencies": {
 		"@types/mocha": "^5.2.7",
 		"@types/node": "^12.12.14",
+		"js-yaml": "^3.13.1",
 		"ts-loader": "^6.2.1",
 		"tslint": "^5.20.0",
 		"typescript": "^3.7.2",
