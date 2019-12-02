@@ -49,7 +49,7 @@ lib1.files = [
 ```
 
 ## Syntax coloring
-Syntax coloring is based on the textmate [vhdl.tmbundle](https://github.com/kraigher/rust_hdl#vhdl-language-server)  
+Syntax coloring is based on the textmate [vhdl.tmbundle](https://github.com/textmate/vhdl.tmbundle)  
 
 ## Licenses
 The VSCode extension `VHDL LS` is available under the MIT license.
