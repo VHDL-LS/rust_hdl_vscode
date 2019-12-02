@@ -50,7 +50,7 @@
 			{
 				"language": "vhdl",
 				"scopeName": "source.vhdl",
-				"path": "./syntaxes/vhdl.tmLanguage.json"
+				"path": "./syntaxes/vhdl.tmLanguage"
 			}
 		],
 		"snippets": [
@@ -63,14 +63,21 @@
 			"type": "object",
 			"title": "VHDL",
 			"properties": {
-				"vhdlLs.languageServerBinary": {
+				"vhdlls.languageServerBinary": {
+					"description": "Method to find language server executable. Changing this option requires a restart.",
 					"type": "string",
+					"default": "embedded",
 					"enum": [
 						"embedded",
 						"systemPath",
 						"docker"
 					],
-					"description": "Method to find language server executable, Docker option is NOT supported on Windows.\nChanging this option requires a restart of VSCODE"
+					"enumDescriptions": [
+						"Use language server embedded in this extension.",
+						"Run vhdl_ls from system path.",
+						"Use kraigher/vhdl_ls image from Docker Hub"
+					]
+					
 				}
 			}
 		}

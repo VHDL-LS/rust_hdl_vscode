@@ -24,27 +24,19 @@ enum LanguageServerBinary {
 }
 
 const languageServerBinaryName = 'vhdl_ls';
+const isWindows = process.platform === "win32";
 
 export async function activate(context: ExtensionContext) {
     
-    let languageServerBinary = vscode.workspace.getConfiguration().get('vhdlLs.languageServerBinary');
+    // Get language server configuration and command to start server
+    let languageServerBinary =
+        vscode.workspace.getConfiguration().get('vhdlls.languageServerBinary');
     let lsBinary = languageServerBinary as keyof typeof LanguageServerBinary;
-    const isWindows = process.platform === "win32";
-
-    let serverCommand  = context.asAbsolutePath(path.join('server', 'vhdl_ls'));
-    let serverArgs = [];
-    
-    if (isWindows && lsBinary == "docker") {
-        window.showWarningMessage("Docker language server not supported on Windows, using system path instead");
-        lsBinary = "systemPath";
-    }
-    // TODO: If extensions is selected and no vhdl_ls found in /server, use system path
-
     let serverOptions: ServerOptions;
     switch(lsBinary) {
         case "docker": 
             serverOptions = await getServerOptionsDocker(); 
-            console.log('Using Docker image language server');
+            console.log('Using vhdl_ls from Docker Hub');
             break;
         
         case "embedded": 
@@ -63,7 +55,8 @@ export async function activate(context: ExtensionContext) {
     let clientOptions: LanguageClientOptions = {
         documentSelector: [{ scheme: 'file', language: 'vhdl' }],
         synchronize: {
-            // Notify the server about file changes to '.clientrc files contained in the workspace
+            // Notify the server about file changes to '.clientrc files 
+            // contained in the workspace
             fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
         }
     };
@@ -89,31 +82,34 @@ export function deactivate(): Thenable<void> | undefined {
 
 
 async function getServerOptionsDocker() {
-    const dockerImage = 'kraigher/vhdl_ls:latest';
-    const { stdout, stderr } = await exec("docker pull " + dockerImage);
+    const image = 'kraigher/vhdl_ls:latest';
+    let pullCmd = 'docker pull ' + image;
+    console.log(`Pulling '${image}'`);
+    console.log(pullCmd);
+    const { stdout, stderr } = await exec(pullCmd);
     console.log(stdout);
     console.log(stderr);
-    let serverCommand = 'docker';
-    let serverArgs = ['run', '-i', '-a', 'stdin', '-a', 'stdout', '-a', 'stderr', '--rm'];
-    let wsFolders : any = vscode.workspace.workspaceFolders;
-    let pwdIsSet = false;
-    if (wsFolders) {
-        wsFolders.forEach(path => {
-            let folder : vscode.WorkspaceFolder = (path as vscode.WorkspaceFolder);
-            console.log(folder.uri);
-            let fsPath = folder.uri.path;
-            let mountPath = folder.uri.path;
-            if (!pwdIsSet) {
-                pwdIsSet = true;
-                serverArgs.push('-w');
-                serverArgs.push(mountPath);
-            }
-            serverArgs.push('-v');
-            serverArgs.push(fsPath + ':' + mountPath + ':ro');
-            
-        });
+
+    console.log(vscode.workspace.workspaceFolders[0]);
+    let wsPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+    let mountPath = wsPath;
+    if (isWindows) {
+        wsPath = wsPath.replace(/\\/g, "/");
+        mountPath = '/' + wsPath.replace(':', '');
     }
-    serverArgs.push(dockerImage);
+
+    let serverCommand = 'docker';
+    let serverArgs = [
+        'run',
+        '-i',
+        '-a', 'stdin',
+        '-a', 'stdout',
+        '-a', 'stderr',
+        '--rm',
+        // '-w', mountPath,
+        '-v', `${wsPath}:${mountPath}:ro`,
+        image,
+    ];
     console.log(serverCommand);
     console.log(serverArgs);
     let serverOptions: ServerOptions = {
@@ -130,7 +126,8 @@ async function getServerOptionsDocker() {
 }
 
 function getServerOptionsEmbedded(context: ExtensionContext) {
-    let serverCommand = context.asAbsolutePath(path.join('server', languageServerBinaryName));
+    let serverCommand =
+        context.asAbsolutePath(path.join('server', languageServerBinaryName));
     let serverOptions: ServerOptions = {
         run: {
             command: serverCommand

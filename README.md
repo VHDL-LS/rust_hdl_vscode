@@ -12,7 +12,7 @@ VHDL Language Server and Support for Visual Studio Code.
 VHDL LS uses the [Rust HDL](https://github.com/kraigher/rust_hdl#vhdl-language-server) 
 Language Server. Pre-compiled binaries are provided with the extension but it 
 can also be loaded from either the system path or using Docker depending
-on the value of the `vhdlLs.languageServerBinary` property.
+on the value of the `vhdlls.languageServerBinary` property.
 - `embedded`: Use the embedded binary.
 - `systemPath`: Load `vhdl_ls` from path.
 - `docker`: Use [docker image](https://hub.docker.com/r/kraigher/vhdl_ls)
@@ -47,6 +47,9 @@ lib1.files = [
   'tb_ent.vhd',
 ]
 ```
+
+## Syntax coloring
+Syntax coloring is based on the textmate [vhdl.tmbundle](https://github.com/kraigher/rust_hdl#vhdl-language-server)  
 
 ## Licenses
 The VSCode extension `VHDL LS` is available under the MIT license.
