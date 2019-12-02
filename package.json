@@ -63,21 +63,26 @@
 			"type": "object",
 			"title": "VHDL",
 			"properties": {
-				"vhdlls.languageServerBinary": {
+				"vhdlls.languageServer": {
 					"description": "Method to find language server executable. Changing this option requires a restart.",
 					"type": "string",
 					"default": "embedded",
 					"enum": [
 						"embedded",
+						"user",
 						"systemPath",
 						"docker"
 					],
 					"enumDescriptions": [
-						"Use language server embedded in this extension.",
+						"Use language server embedded in extension.",
+						"Use custom path vhdlls.languageServerUserPath",
 						"Run vhdl_ls from system path.",
 						"Use kraigher/vhdl_ls image from Docker Hub"
 					]
-					
+				},
+				"vhdlls.languageServerUserPath": {
+					"description": "Path to vhdl_ls language server executable. Used when vhdlls.languageServer = \"user\"",
+					"type": "string"
 				}
 			}
 		}

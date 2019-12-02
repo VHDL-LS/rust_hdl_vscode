@@ -20,7 +20,7 @@ import {
 let client: LanguageClient;
 
 enum LanguageServerBinary {
-    embedded, systemPath, docker
+    embedded, user, systemPath, docker
 }
 
 const languageServerBinaryName = 'vhdl_ls';
@@ -30,22 +30,34 @@ export async function activate(context: ExtensionContext) {
     
     // Get language server configuration and command to start server
     let languageServerBinary =
-        vscode.workspace.getConfiguration().get('vhdlls.languageServerBinary');
+        vscode.workspace.getConfiguration().get('vhdlls.languageServer');
     let lsBinary = languageServerBinary as keyof typeof LanguageServerBinary;
     let serverOptions: ServerOptions;
     switch(lsBinary) {
-        case "docker": 
-            serverOptions = await getServerOptionsDocker(); 
-            console.log('Using vhdl_ls from Docker Hub');
-            break;
-        
+
         case "embedded": 
             serverOptions = getServerOptionsEmbedded(context);
             console.log('Using embedded language server');
             break;
 
+        case "user":
+            serverOptions = getServerOptionsUser(context);
+            console.log('Using user specified language server');
+            console.log(serverOptions);
+            break;
+
+        case "systemPath":
+            serverOptions = getServerOptionsSystemPath();
+            console.log('Running language server from path');
+            break;
+
+        case "docker": 
+            serverOptions = await getServerOptionsDocker(); 
+            console.log('Using vhdl_ls from Docker Hub');
+            break;
+
         default: 
-            serverOptions = getServerOptionsDefault();
+            serverOptions = getServerOptionsEmbedded(context);
             console.log('Using language server from system path');
             break;
     }
@@ -106,7 +118,6 @@ async function getServerOptionsDocker() {
         '-a', 'stdout',
         '-a', 'stderr',
         '--rm',
-        // '-w', mountPath,
         '-v', `${wsPath}:${mountPath}:ro`,
         image,
     ];
@@ -139,7 +150,23 @@ function getServerOptionsEmbedded(context: ExtensionContext) {
     return serverOptions;
 }
 
-function getServerOptionsDefault() {
+
+function getServerOptionsUser(context: ExtensionContext) {
+    let serverCommand : string =
+        vscode.workspace.getConfiguration().get('vhdlls.languageServerUserPath');
+    let serverOptions: ServerOptions = {
+        run: {
+            command: serverCommand
+        },
+        debug: {
+            command: serverCommand
+        }
+    };
+    return serverOptions;
+}
+
+
+function getServerOptionsSystemPath() {
     let serverCommand = languageServerBinaryName;
     let serverOptions: ServerOptions = {
         run: {

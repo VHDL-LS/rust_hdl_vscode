@@ -12,11 +12,14 @@ VHDL Language Server and Support for Visual Studio Code.
 VHDL LS uses the [Rust HDL](https://github.com/kraigher/rust_hdl#vhdl-language-server) 
 Language Server. Pre-compiled binaries are provided with the extension but it 
 can also be loaded from either the system path or using Docker depending
-on the value of the `vhdlls.languageServerBinary` property.
+on the value of the `vhdlls.languageServer` property.
 - `embedded`: Use the embedded binary.
-- `systemPath`: Load `vhdl_ls` from path.
-- `docker`: Use [docker image](https://hub.docker.com/r/kraigher/vhdl_ls)
- (NOTE: Support for docker is not yet available on Windows)  
+- `user`: Use path provided by user in `vhdlls.languageServerUserPath` property.
+- `systemPath`: Run `vhdl_ls` from path.
+- `docker`: Use [docker image](https://hub.docker.com/r/kraigher/vhdl_ls) (Syntax checks only)
+
+NOTE: On Linux, it may be necessary to set the executable permission
+on the vhdl_ls binary.  
 
 For instructions on compiling the language server, see 
 [Rust HDL](https://github.com/kraigher/rust_hdl)
@@ -47,6 +50,12 @@ lib1.files = [
   'tb_ent.vhd',
 ]
 ```
+
+## Issues
+Issues can be reported at [VHDL LS](https://github.com/Bochlin/rust_hdl_vscode)  
+As VHDL LS uses the Rust HDL language server, issues related to syntax and
+semantic checks should be reported directly to
+[Rust HDL](https://github.com/kraigher/rust_hdl#vhdl-language-server)  
 
 ## Syntax coloring
 Syntax coloring is based on the textmate [vhdl.tmbundle](https://github.com/textmate/vhdl.tmbundle)  
