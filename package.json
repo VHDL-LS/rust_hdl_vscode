@@ -5,7 +5,7 @@
 	"author": "Henrik Bohlin",
 	"publisher": "hbohlin",
 	"license": "SEE LICENSE IN LICENSE",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"icon": "icon.png",
 	"repository": {
 		"type": "git",
@@ -48,6 +48,11 @@
 				"configuration": "./language-configuration.json"
 			}
 		],
+		"configurationDefaults": {
+			"[vhdl]": {
+				"files.encoding": "iso88591"
+			}
+		},
 		"grammars": [
 			{
 				"language": "vhdl",
