@@ -18,7 +18,7 @@ on the value of the `vhdlls.languageServer` property.
 - `systemPath`: Run `vhdl_ls` from path.
 - `docker`: Use [docker image](https://hub.docker.com/r/kraigher/vhdl_ls) (Only supports files below workspace root)
 
-NOTE: On Linux, it may be necessary to set the executable permission
+**NOTE:** On Linux, it may be necessary to set the executable permission
 on the vhdl_ls binary.  
 
 For instructions on compiling the language server, see 
@@ -26,8 +26,9 @@ For instructions on compiling the language server, see
 
 ## Configuration
 The language server uses a configuration file in the [TOML](https://github.com/toml-lang/toml) format named `vhdl_ls.toml`.
-The file contains the library mapping of all files within the project. Files outside of the project without library mapping are checked for syntax errors only.
-
+The file contains the library mapping of all files within the project. Files outside of the project without library mapping are checked for syntax errors only.  
+**NOTE:** The `standard` library and `IEEE` libraries are not included in the extensions and must be mapped in `vhdl_ls.toml`.  
+  
 `vhdl_ls` will load configuration files in the following order of priority (first to last):
 1. A file named `.vhdl_ls.toml` in the user home folder.
 2. A file name from the `VHDL_LS_CONFIG` environment variable.
