@@ -28,7 +28,8 @@
 		"vscode": "^1.32.0"
 	},
 	"activationEvents": [
-		"onLanguage:vhdl"
+		"onLanguage:vhdl",
+		"onCommand:vhdlls.restart"
 	],
 	"main": "./client/out/extension.js",
 	"contributes": {
@@ -86,7 +87,13 @@
 					"type": "string"
 				}
 			}
-		}
+		},
+		"commands": [
+			{
+				"command": "vhdlls.restart",
+				"title": "Restart VHDL LS"
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "cd client && npm run update-vscode && cd .. && npm run compile",

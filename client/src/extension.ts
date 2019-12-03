@@ -82,7 +82,21 @@ export async function activate(context: ExtensionContext) {
     );
 
     // Start the client. This will also launch the server
-    client.start();
+    let languageServerDisposable = client.start();
+
+    // Register command to restart language server
+    context.subscriptions.push(languageServerDisposable);
+    context.subscriptions.push(vscode.commands.registerCommand('vhdlls.restart', async () => {
+        const MSG = 'Restarting VHDL LS'
+        console.log(MSG);
+        window.showInformationMessage(MSG)
+        await client.stop();
+        languageServerDisposable.dispose();
+        languageServerDisposable = client.start();
+        context.subscriptions.push(languageServerDisposable);
+    }));
+
+
 }
 
 export function deactivate(): Thenable<void> | undefined {
