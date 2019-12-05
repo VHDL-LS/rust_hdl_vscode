@@ -8,6 +8,7 @@ import * as path from 'path';
 import vscode = require('vscode');
 import { workspace, ExtensionContext, window } from 'vscode';
 import util = require('util');
+import * as fs from 'fs';
 const exec = util.promisify(require('child_process').exec);
 
 import {
@@ -23,11 +24,20 @@ enum LanguageServerBinary {
     embedded, user, systemPath, docker
 }
 
+const HOMEDIR = require('os').homedir().replace(/\\/g, "/");
+const CONFFILE = 'vhdl_ls.toml';
+const HOMECONF = path.join(HOMEDIR, '.' + CONFFILE);
 const languageServerBinaryName = 'vhdl_ls';
 const isWindows = process.platform === "win32";
 
 export async function activate(context: ExtensionContext) {
-    
+
+    // Default configuration
+    if (!fs.existsSync(HOMECONF)) {
+        console.log("." + CONFFILE + " not found in user HOME");
+        writeDefaultConfig(context);
+    }
+
     // Get language server configuration and command to start server
     let languageServerBinary =
         vscode.workspace.getConfiguration().get('vhdlls.languageServer');
@@ -87,9 +97,9 @@ export async function activate(context: ExtensionContext) {
     // Register command to restart language server
     context.subscriptions.push(languageServerDisposable);
     context.subscriptions.push(vscode.commands.registerCommand('vhdlls.restart', async () => {
-        const MSG = 'Restarting VHDL LS'
+        const MSG = 'Restarting VHDL LS';
         console.log(MSG);
-        window.showInformationMessage(MSG)
+        window.showInformationMessage(MSG);
         await client.stop();
         languageServerDisposable.dispose();
         languageServerDisposable = client.start();
@@ -192,4 +202,22 @@ function getServerOptionsSystemPath() {
         }
     };
     return serverOptions;
+}
+
+
+function writeDefaultConfig(ctx: ExtensionContext) {
+    
+    const LIBDIR = ctx.asAbsolutePath("vhdl/libraries").replace(/\\/g, "/");
+    console.log("Writing standard configuration to " + HOMECONF);
+    let conf = [
+        `[libraries]`,
+        `std.files = [`,
+        `    "${LIBDIR}/std_2008/*.vhd",`,
+        `]`,
+        `ieee.files = [`,
+        `    "${LIBDIR}/ieee_2008/*.vhdl",`,
+        `    "${LIBDIR}/synopsys/*.vhdl",`,
+        `]\n`
+    ];
+    fs.writeFileSync(HOMECONF, conf.join('\n'));
 }
