@@ -1,4 +1,4 @@
-/* --------------------------------------------------------------------------------------------
+/* ------------------------------------------------------------------------------------------
  * MIT License
  * Copyright (c) 2019 Henrik Bohlin
  * Full license text can be found in /LICENSE or at https://opensource.org/licenses/MIT.
@@ -8,14 +8,14 @@ import * as path from 'path';
 import vscode = require('vscode');
 import { workspace, ExtensionContext, window } from 'vscode';
 import util = require('util');
-import * as fs from 'fs';
+const fs = require('fs-extra');
+const replace = require('replace-in-file');
 const exec = util.promisify(require('child_process').exec);
 
 import {
     LanguageClient,
     LanguageClientOptions,
     ServerOptions,
-    DiagnosticSeverity,
 } from 'vscode-languageclient';
 
 let client: LanguageClient;
@@ -37,10 +37,7 @@ const isWindows = process.platform === 'win32';
 
 export async function activate(context: ExtensionContext) {
     // Default configuration
-    if (!fs.existsSync(HOMECONF)) {
-        console.log('.' + CONFFILE + ' not found in user HOME');
-        writeDefaultConfig(context);
-    }
+    updateDefaultLibraries(context);
 
     // Get language server configuration and command to start server
     let languageServerBinary = vscode.workspace
@@ -211,18 +208,34 @@ function getServerOptionsSystemPath() {
     return serverOptions;
 }
 
-function writeDefaultConfig(ctx: ExtensionContext) {
-    const LIBDIR = ctx.asAbsolutePath('vhdl/libraries').replace(/\\/g, '/');
-    console.log('Writing standard configuration to ' + HOMECONF);
-    let conf = [
-        `[libraries]`,
-        `std.files = [`,
-        `    "${LIBDIR}/std_2008/*.vhd",`,
-        `]`,
-        `ieee.files = [`,
-        `    "${LIBDIR}/ieee_2008/*.vhdl",`,
-        `    "${LIBDIR}/synopsys/*.vhdl",`,
-        `]\n`,
-    ];
-    fs.writeFileSync(HOMECONF, conf.join('\n'));
+function updateDefaultLibraries(ctx: ExtensionContext) {
+    const libDir = path
+        .join(ctx.globalStoragePath, 'vhdl', 'libraries')
+        .replace(/\\/g, '/');
+    if (!fs.existsSync(libDir)) {
+        console.log(`Installing standard and IEEE libraries to ${libDir}`);
+        fs.copySync(ctx.asAbsolutePath('vhdl/libraries'), libDir);
+    }
+
+    if (!fs.existsSync(HOMECONF)) {
+        console.log('Writing standard configuration to ' + HOMECONF);
+        let conf = [
+            `[libraries]`,
+            `std.files = [`,
+            `    "${libDir}/std_2008/*.vhd",`,
+            `]`,
+            `ieee.files = [`,
+            `    "${libDir}/ieee_2008/*.vhdl",`,
+            `    "${libDir}/synopsys/*.vhdl",`,
+            `]\n`,
+        ];
+        fs.writeFileSync(HOMECONF, conf.join('\n'));
+    } else {
+        console.log('Updating standard configuration ' + HOMECONF);
+        const results = replace({
+            files: HOMECONF,
+            from: /.*hbohlin.vhdl-ls-0.0.4\/vhdl\/libraries/g,
+            to: '    "' + libDir,
+        });
+    }
 }

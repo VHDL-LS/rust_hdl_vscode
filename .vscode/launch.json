@@ -8,11 +8,8 @@
 			"name": "Launch Client",
 			"runtimeExecutable": "${execPath}",
 			"args": ["--extensionDevelopmentPath=${workspaceRoot}"],
-			"outFiles": ["${workspaceRoot}/client/out/**/*.js"],
-			"preLaunchTask": {
-				"type": "npm",
-				"script": "watch"
-			}
+			"outFiles": ["${workspaceRoot}/dist/**/*.js"],
+			"preLaunchTask": "npm: webpack"
 		},
 		{
 			"type": "node",
