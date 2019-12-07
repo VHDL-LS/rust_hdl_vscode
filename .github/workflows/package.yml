@@ -49,9 +49,10 @@ jobs:
               with:
                   name: vhdl_ls-win
             - uses: actions/checkout@v1
-            - run: ls
+            - run: ls server
             - uses: actions/setup-node@v1
               with:
                   node-version: '10'
             - run: npm install
+            - run: npm install -g vsce
             - run: vsce package
