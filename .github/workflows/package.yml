@@ -49,7 +49,7 @@ jobs:
               with:
                   name: vhdl_ls-win
             - uses: actions/checkout@v1
-            - run: ls server
+            - run: ls
             - uses: actions/setup-node@v1
               with:
                   node-version: '10'
