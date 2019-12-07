@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.0.5] - 2019-12-07
+- Standard and IEEE packages are now installed to extension global directory.
+
 ## [0.0.4] - 2019-12-05
 - Added standard and IEEE libraries.
 - If no .vhdl_ls.toml is found in HOME, a standard configuration with std and IEEE is created.
