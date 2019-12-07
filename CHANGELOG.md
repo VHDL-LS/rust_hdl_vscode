@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.0.5] - 2019-12-07
+## [0.0.5] - 2019-12-xx
 - Standard and IEEE packages are now installed to extension global directory.
 
 ## [0.0.4] - 2019-12-05
