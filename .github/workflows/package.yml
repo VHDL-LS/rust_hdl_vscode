@@ -24,16 +24,16 @@ jobs:
     runs-on: windows-latest
     steps:
         - name: Checkout Rust HDL
-            uses: actions/checkout@v1
-            with:
-                repository: kraigher/rust_hdl
+          uses: actions/checkout@v1
+          with:
+              repository: kraigher/rust_hdl
         - name: Build vhdl_ls
-            run: cargo build --release --package vhdl_parser
+          run: cargo build --release --package vhdl_parser
         - name: Upload vhdl_ls executable
-            uses: actions/upload-artifact@v1
-            with:
-                name: server/vhdl_ls.exe
-                path: target/release/vhdl_ls.exe
+          uses: actions/upload-artifact@v1
+          with:
+              name: server/vhdl_ls.exe
+              path: target/release/vhdl_ls.exe
     
     package_extension:
         name: Package extension
@@ -42,7 +42,7 @@ jobs:
         steps:
             - uses: actions/setup-node@v1
               with:
-                node-version: '10' 
+                  node-version: '10' 
             - uses: actions/checkout@v1
             - run: npm install
             - run: npm package
