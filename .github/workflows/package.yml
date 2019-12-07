@@ -13,7 +13,8 @@ jobs:
                   repository: kraigher/rust_hdl
             - name: Build vhdl_ls
               run: cargo build --release --package vhdl_ls --target x86_64-unknown-linux-gnu
-            - run: mkdir server && cp target/x86_64-unknown-linux-gnu/release/vhdl_ls server
+            - name: Copy server
+              run: mkdir server && cp target/x86_64-unknown-linux-gnu/release/vhdl_ls server
             - name: Upload vhdl_ls executable
               uses: actions/upload-artifact@v1
               with:
@@ -21,18 +22,17 @@ jobs:
                   path: server
     
     prepare_windows:
-        name: Build vhdl_ls - Windows
+        name: Prepare Windows
         runs-on: windows-latest
         steps:
             - name: Checkout Rust HDL
               uses: actions/checkout@v2-beta
               with:
                   repository: kraigher/rust_hdl
-            - name: Build vhdl_ls
-              run: cargo build --release --package vhdl_ls --target x86_64-pc-windows-msvc
-            - run: mkdir server && copy target\x86_64-pc-windows-msvc\release\vhdl_ls.exe server
-            - name: Upload vhdl_ls executable
-              uses: actions/upload-artifact@v1
+            - run: cargo build --release --package vhdl_ls --target x86_64-pc-windows-msvc
+            - run: mkdir server
+            - run: copy target\x86_64-pc-windows-msvc\release\vhdl_ls.exe server
+            - uses: actions/upload-artifact@v1
               with:
                   name: vhdl_ls-win
                   path: server
