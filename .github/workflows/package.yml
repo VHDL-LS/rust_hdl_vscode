@@ -1,4 +1,4 @@
-name: Package extension
+name: Package
 
 on: [push]
 
