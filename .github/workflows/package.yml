@@ -76,6 +76,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - run: echo ${GITHUB_REF:10}
+            - run: echo ${GITHUB_REF}
             - if: startsWith(github.ref, 'refs/tags/v')
               run: echo tag
             - run: echo 'test'
