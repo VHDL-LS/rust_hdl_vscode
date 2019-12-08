@@ -5,7 +5,7 @@
 	"author": "Henrik Bohlin",
 	"publisher": "hbohlin",
 	"license": "SEE LICENSE IN LICENSE",
-	"version": "0.0.5",
+	"version": "0.0.5-dev",
 	"icon": "icon.png",
 	"repository": {
 		"type": "git",
@@ -102,7 +102,7 @@
 		]
 	},
 	"scripts": {
-		"vscode:prepublish": "cd client && npm run update-vscode && cd .. && webpack --mode production && webpack --mode production",
+		"vscode:prepublish": "cd client && npm run update-vscode && cd .. && webpack --mode production",
 		"compile": "cd client && tsc -b && cd ..",
 		"watch": "cd client && tsc -b -w  && cd ..",
 		"postinstall": "cd client && npm install && cd ..",
