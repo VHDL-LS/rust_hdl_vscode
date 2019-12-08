@@ -67,3 +67,10 @@ jobs:
               with:
                   name: vhdl-ls
                   path: vhdl-ls
+    
+    publish:
+        if: contains(github.ref, ci-publish)
+        name: Publish
+        runs-on: ubuntu-latest
+        steps:
+            - run: echo buuuuu
