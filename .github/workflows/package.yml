@@ -4,7 +4,6 @@ on: [push]
 
 jobs:
     prepare_linux:
-        if: startsWith(github.ref, 'refs/tags/v')
         name: Prepare Linux (Ubuntu)
         runs-on: ubuntu-latest
         steps:
@@ -23,7 +22,6 @@ jobs:
                   path: server
     
     prepare_windows:
-        if: startsWith(github.ref, 'refs/tags/v')
         name: Prepare Windows
         runs-on: windows-latest
         steps:
@@ -40,7 +38,6 @@ jobs:
                   path: server
     
     package:
-        if: startsWith(github.ref, 'refs/tags/v')
         name: Package
         needs: [prepare_linux, prepare_windows]
         runs-on: ubuntu-latest
@@ -72,21 +69,20 @@ jobs:
                   path: vhdl-ls
          
     publish:
-#         if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v')
         name: Publish
         runs-on: ubuntu-latest
         steps:
-#             - uses: actions/download-artifact@v1
-#               with:
-#                   name: vhdl_ls
-#                   path: vhdl_ls
+            - run: echo ${GITHUB_REF:11}
+            - uses: actions/download-artifact@v1
+              with:
+                  name: vhdl_ls
+                  path: vhdl_ls
             - uses: actions/setup-node@v1
               with:
                   node-version: '10'
             - run: npm install -g vsce
-              env:
-                  VERSION: ${GITHUB_REF:11}
             - run: vsce publish -p $PUBLISH_TOKEN --packagePath vhdl_ls/vhdl-ls-${GITHUB_REF:11}.vsix
               env:
-                PUBLISH_TOKEN: test
+                  PUBLISH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
               
