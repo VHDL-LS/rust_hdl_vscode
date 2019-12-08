@@ -80,6 +80,9 @@ jobs:
 #               with:
 #                   name: vhdl_ls
 #                   path: vhdl_ls
+            - run: echo ${{ github.ref }}
+            - run: echo ${GITHUB_REF}
+            - run: echo ${GITHUB_REF:11}
             - uses: actions/setup-node@v1
               with:
                   node-version: '10'
