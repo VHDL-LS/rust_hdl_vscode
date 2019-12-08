@@ -69,7 +69,7 @@ jobs:
                   path: vhdl-ls
     
     publish:
-        if: contains(github.ref, 'ci-publish')
+        if: contains(github.ref, 'c?-publish')
         name: Publish
         runs-on: ubuntu-latest
         steps:
