@@ -70,8 +70,7 @@ jobs:
               with:
                   name: vhdl-ls
                   path: vhdl-ls
-            - name: Publish
-              if: startsWith(github.ref, 'refs/tags/v')
+
     publish:
         name: Publish
         runs-on: ubuntu-latest
