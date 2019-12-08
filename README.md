@@ -1,8 +1,6 @@
 # VHDL Language Server/Support
 VHDL Language Server and Support for Visual Studio Code.  
 
-[![Build Status](https://github.com/Bochlin/rust_hdl_vscode/workflows/Package/badge.svg)](https://github.com/Bochlin/rust_hdl_vscode/actions?query=workflow%3A%22Package%22)
-
 [![Join the chat at https://gitter.im/rust_hdl/Lobby](https://badges.gitter.im/rust_hdl/Lobby.svg)](https://gitter.im/rust_hdl/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  
 
 ## Features
