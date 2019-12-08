@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.0.5] - 2019-12-xx
+## [0.0.5] - 2019-12-08
 - Standard and IEEE packages are now installed to extension global directory.
 - `vhdl_ls.toml` now redifines library files instead of appending them.
 
