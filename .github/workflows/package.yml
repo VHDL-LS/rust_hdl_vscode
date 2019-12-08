@@ -70,15 +70,18 @@ jobs:
               with:
                   name: vhdl-ls
                   path: vhdl-ls
-
+         
     publish:
+#         if: startsWith(github.ref, 'refs/tags/v')
         name: Publish
         runs-on: ubuntu-latest
         steps:
-            - run: echo ${GITHUB_REF:10}
-            - run: echo ${GITHUB_REF}
-            - if: startsWith(github.ref, 'refs/tags/v')
-              run: echo tag
-            - run: echo 'test'
-            - if: startsWith(github.ref, 'ci-publ')
-              run: echo CI
+#             - uses: actions/download-artifact@v1
+#               with:
+#                   name: vhdl_ls
+#                   path: vhdl_ls
+            - run: vsce publish -p $PUBLISH_TOKEN --packagePath vhdl_ls/vhdl-ls-${VERSION}.vsix
+              env:
+                PUBLISH_TOKEN: test
+                VERSION: ${GITHUB_REF:11}
+              
