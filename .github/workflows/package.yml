@@ -4,6 +4,7 @@ on: [push]
 
 jobs:
     prepare_linux:
+        if: startsWith(github.ref, 'refs/tags/v')
         name: Prepare Linux (Ubuntu)
         runs-on: ubuntu-latest
         steps:
@@ -22,6 +23,7 @@ jobs:
                   path: server
     
     prepare_windows:
+        if: startsWith(github.ref, 'refs/tags/v')
         name: Prepare Windows
         runs-on: windows-latest
         steps:
@@ -38,6 +40,7 @@ jobs:
                   path: server
     
     package:
+        if: startsWith(github.ref, 'refs/tags/v')
         name: Package
         needs: [prepare_linux, prepare_windows]
         runs-on: ubuntu-latest
@@ -67,10 +70,15 @@ jobs:
               with:
                   name: vhdl-ls
                   path: vhdl-ls
-    
+            - name: Publish
+              if: startsWith(github.ref, 'refs/tags/v')
     publish:
-        if: contains(github.ref, 'c?-publish')
         name: Publish
         runs-on: ubuntu-latest
         steps:
-            - run: echo buuuuu
+            - run: echo ${GITHUB_REF:10}
+            - if: startsWith(github.ref, 'refs/tags/v')
+              run: echo tag
+            - run: echo 'test'
+            - if: startsWith(github.ref, 'ci-publ')
+              run: echo CI
