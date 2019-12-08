@@ -87,6 +87,9 @@ jobs:
               with:
                   node-version: '10'
             - run: npm install -g vsce
+            - run: echo ${VERSION}
+              env:
+                  VERSION: ${GITHUB_REF:11}
             - run: vsce publish -p $PUBLISH_TOKEN --packagePath vhdl_ls/vhdl-ls-${VERSION}.vsix
               env:
                 PUBLISH_TOKEN: test
