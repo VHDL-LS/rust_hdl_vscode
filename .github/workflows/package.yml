@@ -43,22 +43,25 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v1
+            - run: mkdir server
             - uses: actions/download-artifact@v1
               with:
                   name: vhdl_ls-ubuntu
-                  path: server/vhdl_ls-ubuntu
-            - run: ls server/vhdl_ls-ubuntu
+                  path: vhdl_ls/vhdl_ls-ubuntu
+            - run: ls vhdl_ls/vhdl_ls-ubuntu
+            - run: cp vhdl_ls/vhdl_ls-ubuntu/vhdl_ls ./server
             - uses: actions/download-artifact@v1
               with:
                   name: vhdl_ls-win
-                  path: server/vhdl_ls-win
-            - run: ls server/vhdl_ls-win
+                  path: vhdl_ls/vhdl_ls-win
+            - run: ls vhdl_ls/vhdl_ls-win
+            - run: cp vhdl_ls/vhdl_ls-win/vhdl_ls.exe ./server
+            - run: rm -r vhdl_ls
             - uses: actions/setup-node@v1
               with:
                   node-version: '10'
             - run: npm install
             - run: npm install -g vsce
-            - run: mkdir server
             - run: cp vhdl_ls-ubuntu/vhdl_ls ./server
             - run: cp vhdl_ls-win/vhdl_ls.exe ./server
             - run: ls
