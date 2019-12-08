@@ -42,13 +42,17 @@ jobs:
         needs: [prepare_linux, prepare_windows]
         runs-on: ubuntu-latest
         steps:
+            - uses: actions/checkout@v1
             - uses: actions/download-artifact@v1
               with:
                   name: vhdl_ls-ubuntu
+                  path: server/vhdl_ls-ubuntu
+            - run: cat server/vhdl_ls-ubuntu
             - uses: actions/download-artifact@v1
               with:
                   name: vhdl_ls-win
-            - uses: actions/checkout@v1
+                  path: server/vhdl_ls-win
+            - run: cat server/vhdl_ls-win
             - uses: actions/setup-node@v1
               with:
                   node-version: '10'
