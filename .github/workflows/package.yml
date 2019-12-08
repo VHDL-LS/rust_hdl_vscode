@@ -47,12 +47,12 @@ jobs:
               with:
                   name: vhdl_ls-ubuntu
                   path: server/vhdl_ls-ubuntu
-            - run: cat server/vhdl_ls-ubuntu
+            - run: ls server/vhdl_ls-ubuntu
             - uses: actions/download-artifact@v1
               with:
                   name: vhdl_ls-win
                   path: server/vhdl_ls-win
-            - run: cat server/vhdl_ls-win
+            - run: ls server/vhdl_ls-win
             - uses: actions/setup-node@v1
               with:
                   node-version: '10'
