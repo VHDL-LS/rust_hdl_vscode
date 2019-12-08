@@ -80,6 +80,7 @@ jobs:
 #               with:
 #                   name: vhdl_ls
 #                   path: vhdl_ls
+            - run: npm install -g vsce
             - run: vsce publish -p $PUBLISH_TOKEN --packagePath vhdl_ls/vhdl-ls-${VERSION}.vsix
               env:
                 PUBLISH_TOKEN: test
