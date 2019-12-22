@@ -77,8 +77,8 @@ jobs:
             - run: echo ${GITHUB_REF:11}
             - uses: actions/download-artifact@v1
               with:
-                  name: vhdl_ls
-                  path: vhdl_ls
+                  name: vhdl-ls
+                  path: vhdl-ls
             - uses: actions/setup-node@v1
               with:
                   node-version: '10'
