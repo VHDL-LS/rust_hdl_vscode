@@ -67,10 +67,6 @@ jobs:
               with:
                   name: vhdl-ls
                   path: vhdl-ls
-            - uses: actions/upload-artifact@v1
-              with:
-                  name: server
-                  path: server
          
     publish:
 #         if: startsWith(github.ref, 'refs/tags/v')
@@ -81,13 +77,13 @@ jobs:
             - run: echo ${GITHUB_REF:11}
             - uses: actions/download-artifact@v1
               with:
-                  name: server
-                  path: server
+                  name: vhdl-ls
+                  path: vhdl-ls
             - uses: actions/setup-node@v1
               with:
                   node-version: '10'
             - run: ls
-            - run: ls server
+            - run: ls vhdl-ls
             - run: npm install -g vsce
 #             - run: vsce publish -p $PUBLISH_TOKEN --packagePath vhdl_ls/vhdl-ls-${GITHUB_REF:11}.vsix
               env:
