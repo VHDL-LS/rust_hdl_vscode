@@ -67,6 +67,10 @@ jobs:
               with:
                   name: vhdl-ls
                   path: vhdl-ls
+            - uses: actions/upload-artifact@v1
+              with:
+                  name: server
+                  path: server
          
     publish:
 #         if: startsWith(github.ref, 'refs/tags/v')
@@ -77,7 +81,7 @@ jobs:
             - run: echo ${GITHUB_REF:11}
             - uses: actions/download-artifact@v1
               with:
-                  name: vhdl-ls
+                  name: server
                   path: server
             - uses: actions/setup-node@v1
               with:
