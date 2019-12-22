@@ -85,7 +85,7 @@ jobs:
             - run: ls
             - run: ls vhdl-ls
             - run: npm install -g vsce
-            - run: vsce publish -p $PUBLISH_TOKEN --packagePath vhdl_ls/vhdl-ls-${GITHUB_REF:11}.vsix
+            - run: vsce publish -p $PUBLISH_TOKEN --packagePath vhdl-ls/vhdl-ls-${GITHUB_REF:11}.vsix
               env:
                   PUBLISH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
               
