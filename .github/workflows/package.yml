@@ -82,6 +82,8 @@ jobs:
             - uses: actions/setup-node@v1
               with:
                   node-version: '10'
+            - run: ls
+            - run: ls vhdl-ls
             - run: npm install -g vsce
             - run: vsce publish -p $PUBLISH_TOKEN --packagePath vhdl_ls/vhdl-ls-${GITHUB_REF:11}.vsix
               env:
