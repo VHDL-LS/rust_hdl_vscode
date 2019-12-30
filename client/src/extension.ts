@@ -27,18 +27,10 @@ enum LanguageServerBinary {
     docker,
 }
 
-const HOMEDIR = require('os')
-    .homedir()
-    .replace(/\\/g, '/');
-const CONFFILE = 'vhdl_ls.toml';
-const HOMECONF = path.join(HOMEDIR, '.' + CONFFILE);
 const languageServerBinaryName = 'vhdl_ls';
 const isWindows = process.platform === 'win32';
 
 export async function activate(context: ExtensionContext) {
-    // Default configuration
-    updateDefaultLibraries(context);
-
     // Get language server configuration and command to start server
     let languageServerBinary = vscode.workspace
         .getConfiguration()
@@ -167,7 +159,7 @@ async function getServerOptionsDocker() {
 
 function getServerOptionsEmbedded(context: ExtensionContext) {
     let serverCommand = context.asAbsolutePath(
-        path.join('server', languageServerBinaryName)
+        path.join('server', 'bin', languageServerBinaryName)
     );
     let serverOptions: ServerOptions = {
         run: {
@@ -206,36 +198,4 @@ function getServerOptionsSystemPath() {
         },
     };
     return serverOptions;
-}
-
-function updateDefaultLibraries(ctx: ExtensionContext) {
-    const libDir = path
-        .join(ctx.globalStoragePath, 'vhdl', 'libraries')
-        .replace(/\\/g, '/');
-    if (!fs.existsSync(libDir)) {
-        console.log(`Installing standard and IEEE libraries to ${libDir}`);
-        fs.copySync(ctx.asAbsolutePath('vhdl/libraries'), libDir);
-    }
-
-    if (!fs.existsSync(HOMECONF)) {
-        console.log('Writing standard configuration to ' + HOMECONF);
-        let conf = [
-            `[libraries]`,
-            `std.files = [`,
-            `    "${libDir}/std_2008/*.vhd",`,
-            `]`,
-            `ieee.files = [`,
-            `    "${libDir}/ieee_2008/*.vhdl",`,
-            `    "${libDir}/synopsys/*.vhdl",`,
-            `]\n`,
-        ];
-        fs.writeFileSync(HOMECONF, conf.join('\n'));
-    } else {
-        console.log('Updating standard configuration ' + HOMECONF);
-        const results = replace({
-            files: HOMECONF,
-            from: /.*hbohlin.vhdl-ls-0.0.4\/vhdl\/libraries/g,
-            to: '    "' + libDir,
-        });
-    }
 }

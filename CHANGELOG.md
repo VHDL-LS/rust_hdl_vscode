@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.2.0] - 2019-12-30
+- Standard and IEEE packages are now integrated by the `vhdl_ls` language server.  
+**NOTE**: These libraries should be removed from any global `vhdl_ls.toml` files.
+
 ## [0.1.0] - 2019-12-21
 - Standard and IEEE packages are now installed to extension global directory.
 - Updated language server
