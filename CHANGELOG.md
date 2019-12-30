@@ -1,7 +1,7 @@
 # Changelog
 
 ## [0.2.0] - 2019-12-30
-- Embedded `vhdl_ls` updated to version 0.10.0.
+- Embedded `vhdl_ls` updated to version 0.12.0.
 - Standard and IEEE packages are now integrated by the `vhdl_ls` language server.  
 **NOTE**: These libraries should be removed from any global `vhdl_ls.toml` files.
 
