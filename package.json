@@ -115,7 +115,6 @@
 		"@types/mocha": "^5.2.7",
 		"@types/node": "^12.12.14",
 		"js-yaml": "^3.13.1",
-		"prettier": "^1.19.1",
 		"ts-loader": "^6.2.1",
 		"tslint": "^5.20.0",
 		"typescript": "^3.7.2",
