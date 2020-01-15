@@ -217,6 +217,27 @@
 			],
 		"description": "entity declaration"
 	},
+	"Entity and Architecture": {
+		"prefix": "entarch",
+			"body": [
+				"entity ${1:$TM_FILENAME_BASE} is",
+				"\tport (",
+				"\t\t${2:clk   : in std_logic;}",
+				"\t\t${3:reset : in std_logic;}",
+				"\t\t$0",
+				"\t);",
+				"end entity $1;",
+				"",
+				"architecture ${4:rtl} of $1 is",
+				"",
+				"begin",
+				"",
+				"\t$0",
+				"",
+				"end architecture;"
+			],
+		"description": "entity declaration"
+	},
 	"Enumerate": {
 		"prefix": ["typeenum", "typefsm"],
 		"body": [
