@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.3.0] - 2020-01-26
+- Added automatic updates of language server
+- Added `entarch` snipped for Entity + Architecture
+
 ## [0.2.0] - 2019-12-30
 - Embedded `vhdl_ls` updated to version 0.12.0.
 - Standard and IEEE packages are now integrated by the `vhdl_ls` language server.  

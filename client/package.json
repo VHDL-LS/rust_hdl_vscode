@@ -3,7 +3,7 @@
 	"description": "VHDL LS Client",
 	"author": "Henrik Bohlin",
 	"license": "SEE LICENSE IN LICENCE",
-	"version": "0.1.0",
+	"version": "0.3.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Bochlin/rust_hdl_vscode"
