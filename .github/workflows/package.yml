@@ -16,7 +16,7 @@ jobs:
           mkdir --parents server/vhdl_ls/$ver
           unzip temp/vhdl_ls-x86_64-unknown-linux-gnu.zip -d server/vhdl_ls/$ver
           unzip temp/vhdl_ls-x86_64-pc-windows-msvc.zip -d server/vhdl_ls/$ver
-          rmdir -r temp
+          rm -r temp
       - uses: actions/setup-node@v1
         with:
           node-version: '10'
