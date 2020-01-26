@@ -14,6 +14,7 @@ import vscode = require('vscode');
 import { workspace, ExtensionContext, window } from 'vscode';
 import util = require('util');
 import * as lockfile from 'proper-lockfile';
+import AbortController from 'abort-controller';
 const exec = util.promisify(require('child_process').exec);
 
 import {
@@ -44,7 +45,9 @@ export async function activate(ctx: ExtensionContext) {
     );
     let languageServerVersion = embeddedVersion(languageServerDir);
     if (languageServerVersion == '0.0.0') {
-        await getLatestLanguageServer(ctx).catch(err => console.log(err));
+        console.log('No language server installed');
+        window.showInformationMessage('Downloading language server');
+        await getLatestLanguageServer(60000, ctx);
         languageServerVersion = embeddedVersion(languageServerDir);
     }
     console.log(languageServerVersion);
@@ -135,7 +138,7 @@ export async function activate(ctx: ExtensionContext) {
             lockfilePath: ctx.asAbsolutePath(path.join('server', '.lock')),
         })
         .then((release: () => void) => {
-            getLatestLanguageServer(ctx)
+            getLatestLanguageServer(60000, ctx)
                 .catch(err => {
                     console.log(err);
                 })
@@ -271,7 +274,10 @@ const rustHdl = {
     repo: 'rust_hdl',
 };
 
-async function getLatestLanguageServer(ctx: ExtensionContext) {
+async function getLatestLanguageServer(
+    timeoutMs: number,
+    ctx: ExtensionContext
+) {
     // Get current and latest version
     const octokit = new Octokit({ userAgent: 'rust_hdl_vscode' });
     let latestRelease = await octokit.repos.getLatestRelease({
@@ -312,7 +318,20 @@ async function getLatestLanguageServer(ctx: ExtensionContext) {
         }
 
         console.log('Fetching ' + browser_download_url);
-        let download = await fetch(browser_download_url);
+        const abortController = new AbortController();
+        const timeout = setTimeout(() => {
+            abortController.abort();
+        }, timeoutMs);
+        let download = await fetch(browser_download_url, {
+            signal: abortController.signal,
+        }).catch(err => {
+            console.log(err);
+            throw new Error(
+                `Language server download timed out after ${timeoutMs.toFixed(
+                    2
+                )} seconds.`
+            );
+        });
         if (download.status != 200) {
             throw new Error('Download returned status != 200');
         }
