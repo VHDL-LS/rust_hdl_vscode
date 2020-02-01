@@ -5,7 +5,7 @@
 	"author": "Henrik Bohlin",
 	"publisher": "hbohlin",
 	"license": "SEE LICENSE IN LICENSE",
-	"version": "0.2.0",
+	"version": "0.3.0",
 	"icon": "icon.png",
 	"repository": {
 		"type": "git",
@@ -57,7 +57,7 @@
 			{
 				"language": "vhdl",
 				"scopeName": "source.vhdl",
-				"path": "./syntaxes/vhdl.tmLanguage"
+				"path": "./syntaxes/vhdl.tmLanguage.json"
 			}
 		],
 		"snippets": [
@@ -102,14 +102,16 @@
 		]
 	},
 	"scripts": {
-		"vscode:prepublish": "cd client && npm run update-vscode && cd .. && webpack --mode production",
+		"vscode:prepublish": "npm run vscode:update && webpack --mode production",
+		"vscode:update": "cd client && npm run update-vscode && cd ..",
 		"compile": "cd client && tsc -b && cd ..",
 		"watch": "cd client && tsc -b -w  && cd ..",
 		"postinstall": "cd client && npm install && cd ..",
 		"test": "sh ./scripts/e2e.sh",
-		"webpack": "webpack --mode development",
+		"webpack": "npm run build:syntax && webpack --mode development",
 		"webpack-dev": "webpack --mode development --watch",
-		"test-compile": "tsc -p ./"
+		"test-compile": "tsc -p ./",
+		"build:syntax": "js-yaml ./syntaxes/vhdl.tmLanguage.yml > ./syntaxes/vhdl.tmLanguage.json"
 	},
 	"devDependencies": {
 		"@types/mocha": "^5.2.7",

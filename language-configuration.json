@@ -15,5 +15,9 @@
         ["(", ")"],
         ["\"", "\""],
         ["\\", "\\"]
-    ]
+    ],
+    "indentationRules": {
+        "increaseIndentPattern": "\\b(begin|is|port|else|loop|generate|then)\\b",
+        "decreaseIndentPattern": "^\\s*(elsif|else|end|begin)\\b"
+    }
 }

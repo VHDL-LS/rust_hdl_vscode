@@ -50,7 +50,7 @@ repository:
     patterns:
       - begin: (?i)\b(library)\s+
         beginCaptures:
-          1: { name: keyword.reserved.vhdl }
+          1: { name: keyword.control.import.vhdl }
         end: (;)
         endCaptures:
           1: { name: keyword.operator.vhdl }
@@ -67,7 +67,7 @@ repository:
     patterns:
       - begin: (?i)\b(use)\s+
         beginCaptures:
-          1: { name: keyword.reserved.vhdl }
+          1: { name: keyword.control.use.vhdl }
         end: (;)
         endCaptures:
           1: { name: keyword.operator }
@@ -76,7 +76,7 @@ repository:
           - include: "#use_prefix"
           - match: (?i)(all)|([a-z][a-z0-9_]*)
             captures:
-              1: { name: keyword.reserved.vhdl }
+              1: { name: keyword.control.all.vhdl }
               2: { name: entity.name.type.vhdl }
           - include: "#comments"
 
@@ -84,7 +84,7 @@ repository:
     patterns:
       - begin: (?i)\b(context)\s+
         beginCaptures:
-          1: { name: keyword.reserved.vhdl }
+          1: { name: keyword.control.context.vhdl }
         end: (;)
         endCaptures:
           1: { name: keyword.operator.vhdl }
@@ -107,17 +107,17 @@ repository:
           ([a-z][a-z0-9_]*)\s+
           (is)
         beginCaptures:
-          1: { name: keyword.reserved.vhdl }
+          1: { name: storage.type.context.vhdl } 
           2: { name: entity.name.type.vhdl }
-          3: { name: keyword.reserved.vhdl }
+          3: { name: keyword.control.is.vhdl }
         end: (?xi)
           \b(end)\s*
           (context)?\s*
           ([a-z][a-z0-9_]*)?\s*
           (;)
         endCaptures:
-          1: { name: keyword.reserved.vhdl }
-          2: { name: keyword.reserved.vhdl }
+          1: { name: keyword.control.end.vhdl }
+          2: { name: storage.type.context.vhdl }
           3: { name: entity.name.type.vhdl }
           4: { name: keyword.operator.vhdl }
         patterns:
@@ -138,17 +138,17 @@ repository:
           ([a-z][a-z0-9_]*)\s+
           (is)
         beginCaptures:
-          1: { name: keyword.reserved.vhdl }
+          1: { name: storage.type.entity.vhdl }
           2: { name: entity.name.type.vhdl }
-          3: { name: keyword.reserved.vhdl }
+          3: { name: keyword.control.is.vhdl }
         end: (?xi)
           \b(end)\s*
           (entity)?\s*
           ([a-z][a-z0-9_]*)?\s*
           (;)
         endCaptures:
-          1: { name: keyword.reserved.vhdl }
-          2: { name: keyword.reserved.vhdl }
+          1: { name: keyword.control.end.vhdl }
+          2: { name: storage.type.entity.vhdl }
           3: { name: entity.name.type.vhdl }
           4: { name: keyword.operator.vhdl }
         patterns:
@@ -168,19 +168,19 @@ repository:
           ([a-z][a-z0-9_]*)\s+
           (is)
         beginCaptures:
-          1: { name: keyword.reserved.vhdl }
+          1: { name: storage.type.configuration.vhdl }
           2: { name: entity.name.type.vhdl }
-          3: { name: keyword.reserved.vhdl }
+          3: { name: keyword.control.of.vhdl }
           4: { name: entity.other.inherited-class.vhdl }
-          5: { name: keyword.reserved.vhdl }
+          5: { name: keyword.control.is.vhdl }
         end: (?xi)
           \b(end)\s*
           (configuration)?\s*
           ([a-z][a-z0-9_]*)?\s*
           (;)
         endCaptures:
-          1: { name: keyword.reserved.vhdl }
-          2: { name: keyword.reserved.vhdl }
+          1: { name: keyword.control.end.vhdl }
+          2: { name: storage.type.configuration.vhdl }
           3: { name: entity.name.type.vhdl }
           4: { name: keyword.operator.vhdl }
         patterns:
@@ -199,17 +199,17 @@ repository:
           ([a-z][a-z0-9_]*)\s+
           (is)
         beginCaptures:
-          1: { name: keyword.reserved.vhdl }
+          1: { name: storage.type.package.vhdl }
           2: { name: entity.name.type.vhdl }
-          3: { name: keyword.reserved.vhdl }
+          3: { name: keyword.control.is.vhdl }
         end: (?xi)
           \b(end)\s*
           (package(?i:\s+body)?)?\s*
           ([a-z][a-z0-9_]*)?\s*
           (;)
         endCaptures:
-          1: { name: keyword.reserved.vhdl }
-          2: { name: keyword.reserved.vhdl }
+          1: { name: keyword.control.end.vhdl }
+          2: { name: storage.type.package.vhdl }
           3: { name: entity.name.type.vhdl }
           4: { name: keyword.operator.vhdl }
         patterns:
@@ -229,9 +229,9 @@ repository:
           (?i:[a-z][a-z0-9_]*\.)*
           ([a-z][a-z0-9_]*)
         beginCaptures:
-          1: { name: keyword.reserved.vhdl }
+          1: { name: storage.type.package.vhdl }
           2: { name: entity.name.type.vhdl }
-          3: { name: keyword.reserved.vhdl }
+          3: { name: keyword.control.new.vhdl }
           4: { name: entity.other.inherited-class.vhdl }
           5: { name: keyword.operator.vhdl }
         end: (;)
@@ -254,19 +254,19 @@ repository:
           ([a-z][a-z0-9_]*)\s+
           (is)
         beginCaptures:
-          1: { name: keyword.reserved.vhdl }
+          1: { name: storage.type.architecture.vhdl }
           2: { name: entity.name.type.vhdl }
-          3: { name: keyword.reserved.vhdl }
+          3: { name: keyword.control.of.vhdl }
           4: { name: entity.other.inherited-class.vhdl }
-          5: { name: keyword.reserved.vhdl }
+          5: { name: keyword.control.is.vhdl }
         end: (?xi)
           \b(end)\s*
           (architecture)?\s*
           ([a-z][a-z0-9_]*)?\s*
           (;)
         endCaptures:
-          1: { name: keyword.reserved.vhdl }
-          2: { name: keyword.reserved.vhdl }
+          1: { name: keyword.control.end.vhdl }
+          2: { name: storage.type.architecture.vhdl }
           3: { name: entity.name.type.vhdl }
           4: { name: keyword.operator.vhdl }
         patterns:
@@ -310,7 +310,7 @@ repository:
       - name: meta.block.block_statement.vhdl
         begin: (?i)\b(block)\b
         beginCaptures:
-          1: { name: keyword.reserved.vhdl }
+          1: { name: storage.type.block.vhdl }
         end: (?xi)
           \b(end\s+block)\s*
           ([a-z][a-z0-9_]*)?
@@ -322,7 +322,7 @@ repository:
         patterns:
           - match: (?i)\b(is)\b
             captures:
-              1: { name: keyword.reserved.vhdl } # Stops subprogram_body pattern
+              1: { name: keyword.control.is.vhdl } # Stops subprogram_body pattern
           - include: "#grouping_statements"
 
   case_statement:
@@ -332,21 +332,21 @@ repository:
       - name: meta.block.case_statement.vhdl
         begin: (?i)\b(case)\b
         beginCaptures:
-          1: { name: keyword.reserved.vhdl }
+          1: { name: keyword.control.case.vhdl }
         end: (?xi)
           \b(end\s+(?i:case|generate))\s*
           (\?)?\s*
           ([a-z][a-z0-9_]*)?\s*
           (;)
         endCaptures:
-          1: { name: keyword.reserved.vhdl }
+          1: { name: keyword.control.end.vhdl }
           2: { name: keyword.operator.vhdl }
           3: { name: entity.name.tag.vhdl }
           4: { name: keyword.operator.vhdl }
         patterns:
           - match: (?i)\b(is)\b
             captures:
-              1: { name: keyword.reserved.vhdl } # Stops subprogram_body pattern
+              1: { name: keyword.control.is.vhdl } # Stops subprogram_body pattern
           - include: "#grouping_statements"
 
   component_declaration:
@@ -358,17 +358,19 @@ repository:
           ([a-z][a-z0-9_]*)\s*
           (is)?
         beginCaptures:
-          1: { name: keyword.reserved.vhdl }
+          1: { name: storage.type.class.vhdl }
           2: { name: entity.name.type.vhdl }
-          3: { name: keyword.reserved.vhdl }
+          3: { name: keyword.control.is.vhdl }
         end: (?xi)
-          \b(end\s+component)\s*
+          \b(end)\s+
+          (component)\s*
           ([a-z][a-z0-9_]*)?\s*
           (;)
         endCaptures:
-          1: { name: keyword.reserved.vhdl }
-          2: { name: entity.name.type.vhdl }
-          3: { name: keyword.operator.vhdl }
+          1: { name: keyword.control.end.vhdl }
+          2: { name: storage.type.class.vhdl }
+          3: { name: entity.name.type.vhdl }
+          4: { name: keyword.operator.vhdl }
         patterns:
           - include: "#grouping_statements"
 
@@ -398,13 +400,13 @@ repository:
       - name: meta.block.if_statement.vhdl
         begin: (?i)\b(if)\b
         beginCaptures:
-          1: { name: keyword.reserved.vhdl }
+          1: { name: keyword.control.if.vhdl }
         end: (?xi)
           \b(end\s+(?i:if|generate))\s*
           ([a-z][a-z0-9_]*)?\s*
           (;)
         endCaptures:
-          1: { name: keyword.reserved.vhdl }
+          1: { name: keyword.control.end.vhdl }
           2: { name: entity.name.tag.vhdl }
           3: { name: keyword.operator.vhdl }
         patterns:
@@ -445,25 +447,27 @@ repository:
     # [postponed] process ... end [postponed] process [label] ;
     patterns:
       - name: meta.block.process_statement.vhdl
-        begin: (?i)\b((?i:postponed\s+)?process)
+        begin: (?i)\b((?i:postponed\s+)?(process))
         beginCaptures:
-          1: { name: keyword.reserved.vhdl }
+          1: { name: keyword.control.postponed.vhdl }
+          2: { name: storage.type.process.vhdl }
         end: (?xi)
           \b(end)\s+
-          ((?i:postponed\s+)?process)\s*
+          ((?i:postponed\s+)?(process))\s*
           ([a-z][a-z0-9_]*)?
           (;)
         endCaptures:
-          1: { name: keyword.reserved.vhdl }
-          2: { name: keyword.reserved.vhdl }
-          3: { name: entity.name.tag.vhdl }
-          4: { name: keyword.operator.vhdl }
+          1: { name: keyword.control.end.vhdl }
+          2: { name: keyword.control.postponed.vhdl }
+          3: { name: storage.type.process.vhdl }
+          4: { name: entity.name.tag.vhdl }
+          5: { name: keyword.operator.vhdl }
         patterns:
           - match: (?i)\b(is)\b
             captures:
-              1: { name: keyword.reserved.vhdl } # Stops subprogram_body pattern
+              1: { name: keyword.control.is.vhdl } # Stops subprogram_body pattern
           - include: "#grouping_statements"
-
+        
   protected_type_declaration:
     # protected ... end protected [label] ;
     # protected body ... end protected body [label] ;
@@ -471,15 +475,16 @@ repository:
       - name: meta.block.protected_type_declaration.vhdl
         begin: (?i)\b(protected(?i:\s+body)?)\b
         beginCaptures:
-          1: { name: keyword.reserved.vhdl }
+          1: { name: storage.type.class.vhdl }
         end: (?xi)
-          \b(end\s+protected(?i:\s+body)?)\s*
+          \b((end)\s+(protected(?i:\s+body)?))\s*
           ([a-z][a-z0-9_]*)?\s*
           (;)
         endCaptures:
-          1: { name: keyword.reserved.vhdl }
-          2: { name: entity.name.type.vhdl }
-          3: { name: keyword.operator.vhdl }
+          2: { name: keyword.control.end.vhdl}
+          3: { name: storage.type.class.vhdl }
+          4: { name: entity.name.type.vhdl }
+          5: { name: keyword.operator.vhdl }
         patterns:
           - include: "#grouping_statements"
 
@@ -694,9 +699,9 @@ repository:
       - name: meta.block.type_statement.vhdl
         match: (?i)\b(type)\s+([a-z][a-z0-9_]*)\s+(is)
         captures:
-          1: { name: keyword.reserved.vhdl }
+          1: { name: storage.type.vhdl }
           2: { name: entity.name.type.vhdl }
-          3: { name: keyword.reserved.vhdl }
+          3: { name: keyword.control.is.vhdl }
 
   subtype_statement:
     # subtype label is label
@@ -911,7 +916,7 @@ repository:
           variable|vmode|vprop|vunit|
           wait|when|while|with|
           xnor|xor)\b
-        name: keyword.reserved.vhdl
+        name: keyword.control.others.vhdl
 
   delimiters:
     patterns:
