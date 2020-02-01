@@ -3,4 +3,4 @@ node_modules
 .vscode-test
 *.vsix
 dist
-!server/bin/vhdl_ls.exe
+server

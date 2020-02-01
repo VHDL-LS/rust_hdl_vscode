@@ -1,7 +1,0 @@
-[libraries]
-std.files = [
-'std/*.vhd',
-]
-ieee.files = [
-'ieee2008/*.vhdl'
-]

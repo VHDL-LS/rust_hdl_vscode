@@ -3,7 +3,7 @@
 	"description": "VHDL LS Client",
 	"author": "Henrik Bohlin",
 	"license": "SEE LICENSE IN LICENCE",
-	"version": "0.1.0",
+	"version": "0.3.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Bochlin/rust_hdl_vscode"
@@ -17,8 +17,13 @@
 	},
 	"dependencies": {
 		"vscode-languageclient": "^5.2.1",
-		"replace-in-file": "^4.2.0",
-		"fs-extra": "8.1.0"
+		"@octokit/rest": "16.36.0",
+		"@types/node-fetch": "2.5.4",
+		"extract-zip": "1.6.2",
+		"@types/semver": "6.2.0",
+		"proper-lockfile": "4.1.1",
+		"fs-extra": "8.1.0",
+		"abort-controller": "3.0.0"
 	},
 	"devDependencies": {
 		"vscode": "^1.1.36"
