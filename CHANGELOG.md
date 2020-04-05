@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.3.1] - 2020-04-05
+- Fix client crashing when open file without workspace
+
 ## [0.3.0] - 2020-01-26
 - Added automatic updates of language server
 - Added `entarch` snipped for Entity + Architecture

@@ -16,6 +16,7 @@ import util = require('util');
 import * as lockfile from 'proper-lockfile';
 import AbortController from 'abort-controller';
 const exec = util.promisify(require('child_process').exec);
+const output = vscode.window.createOutputChannel('VHDL LS Client');
 
 import {
     LanguageClient,
@@ -43,14 +44,18 @@ export async function activate(ctx: ExtensionContext) {
     const languageServerDir = ctx.asAbsolutePath(
         path.join('server', 'vhdl_ls')
     );
+    output.appendLine(
+        'Checking for language server executable in ' + languageServerDir
+    );
     let languageServerVersion = embeddedVersion(languageServerDir);
     if (languageServerVersion == '0.0.0') {
-        console.log('No language server installed');
-        window.showInformationMessage('Downloading language server');
+        output.appendLine('No language server installed');
+        window.showInformationMessage('Downloading language server...');
         await getLatestLanguageServer(60000, ctx);
         languageServerVersion = embeddedVersion(languageServerDir);
+    } else {
+        output.appendLine('Found version ' + languageServerVersion);
     }
-    console.log(languageServerVersion);
     languageServer = path.join(
         'server',
         'vhdl_ls',
@@ -61,7 +66,9 @@ export async function activate(ctx: ExtensionContext) {
     );
 
     // Get language server configuration and command to start server
-    let languageServerBinary = vscode.workspace
+
+    let workspace = vscode.workspace;
+    let languageServerBinary = workspace
         .getConfiguration()
         .get('vhdlls.languageServer');
     let lsBinary = languageServerBinary as keyof typeof LanguageServerBinary;
@@ -69,43 +76,44 @@ export async function activate(ctx: ExtensionContext) {
     switch (lsBinary) {
         case 'embedded':
             serverOptions = getServerOptionsEmbedded(ctx);
-            console.log('Using embedded language server');
+            output.appendLine('Using embedded language server');
             break;
 
         case 'user':
             serverOptions = getServerOptionsUser(ctx);
-            console.log('Using user specified language server');
-            console.log(serverOptions);
+            output.appendLine('Using user specified language server');
             break;
 
         case 'systemPath':
             serverOptions = getServerOptionsSystemPath();
-            console.log('Running language server from path');
+            output.appendLine('Running language server from path');
             break;
 
         case 'docker':
             serverOptions = await getServerOptionsDocker();
-            console.log('Using vhdl_ls from Docker Hub');
+            output.appendLine('Using vhdl_ls from Docker Hub');
             break;
 
         default:
             serverOptions = getServerOptionsEmbedded(ctx);
-            console.log('Using embedded language server (default)');
+            output.appendLine('Using embedded language server (default)');
             break;
     }
 
     // Options to control the language client
     let clientOptions: LanguageClientOptions = {
         documentSelector: [{ scheme: 'file', language: 'vhdl' }],
-        synchronize: {
+    };
+    if (workspace.workspaceFolders) {
+        clientOptions.synchronize = {
             fileEvents: workspace.createFileSystemWatcher(
                 path.join(
-                    vscode.workspace.workspaceFolders[0].uri.fsPath,
+                    workspace.workspaceFolders[0].uri.fsPath,
                     'vhdl_ls.toml'
                 )
             ),
-        },
-    };
+        };
+    }
 
     // Create the language client
     client = new LanguageClient(
@@ -123,7 +131,7 @@ export async function activate(ctx: ExtensionContext) {
     ctx.subscriptions.push(
         vscode.commands.registerCommand('vhdlls.restart', async () => {
             const MSG = 'Restarting VHDL LS';
-            console.log(MSG);
+            output.appendLine(MSG);
             window.showInformationMessage(MSG);
             await client.stop();
             languageServerDisposable.dispose();
@@ -132,23 +140,23 @@ export async function activate(ctx: ExtensionContext) {
         })
     );
 
-    console.log('Checking for updates');
+    output.appendLine('Checking for updates...');
     lockfile
         .lock(ctx.asAbsolutePath('server'), {
             lockfilePath: ctx.asAbsolutePath(path.join('server', '.lock')),
         })
         .then((release: () => void) => {
             getLatestLanguageServer(60000, ctx)
-                .catch(err => {
-                    console.log(err);
+                .catch((err) => {
+                    output.appendLine(err);
                 })
                 .finally(() => {
-                    console.log('Language server update finished.');
+                    output.appendLine('Language server update finished.');
                     return release();
                 });
         });
 
-    console.log('Started');
+    output.appendLine('Language server started');
 }
 
 export function deactivate(): Thenable<void> | undefined {
@@ -166,7 +174,7 @@ function embeddedVersion(languageServerDir: string): string {
                 if (semver.gt(dir, version)) {
                     fs.remove(path.join(languageServerDir, version)).catch(
                         (err: any) => {
-                            console.log(err);
+                            output.appendLine(err);
                         }
                     );
                     return dir;
@@ -182,13 +190,12 @@ function embeddedVersion(languageServerDir: string): string {
 async function getServerOptionsDocker() {
     const image = 'kraigher/vhdl_ls:latest';
     let pullCmd = 'docker pull ' + image;
-    console.log(`Pulling '${image}'`);
-    console.log(pullCmd);
+    output.appendLine(`Pulling '${image}'`);
+    output.appendLine(pullCmd);
     const { stdout, stderr } = await exec(pullCmd);
-    console.log(stdout);
-    console.log(stderr);
+    output.append(stdout);
+    output.append(stderr);
 
-    console.log(vscode.workspace.workspaceFolders[0]);
     let wsPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
     let mountPath = wsPath;
     if (isWindows) {
@@ -213,8 +220,6 @@ async function getServerOptionsDocker() {
         `${wsPath}:${mountPath}:ro`,
         image,
     ];
-    console.log(serverCommand);
-    console.log(serverArgs);
     let serverOptions: ServerOptions = {
         run: {
             command: serverCommand,
@@ -298,18 +303,18 @@ async function getLatestLanguageServer(
     }
 
     let latest = semver.valid(semver.coerce(latestRelease.data.name));
-    console.log(`Current vhdl_ls version: ${current}`);
-    console.log(`Latest vhdl_ls version: ${latest}`);
+    output.appendLine(`Current vhdl_ls version: ${current}`);
+    output.appendLine(`Latest vhdl_ls version: ${latest}`);
 
     // Download new version if available
     if (semver.prerelease(latest)) {
-        console.log('Latest is pre-release, skipping');
+        output.appendLine('Latest version is pre-release, skipping');
     } else if (semver.lte(latest, current)) {
-        console.log('Language server is already up-to-date');
+        output.appendLine('Language server is up-to-date');
     } else {
         const languageServerAssetName = languageServerName + '.zip';
         let browser_download_url = latestRelease.data.assets.filter(
-            asset => asset.name == languageServerAssetName
+            (asset) => asset.name == languageServerAssetName
         )[0].browser_download_url;
         if (browser_download_url.length == 0) {
             throw new Error(
@@ -317,15 +322,15 @@ async function getLatestLanguageServer(
             );
         }
 
-        console.log('Fetching ' + browser_download_url);
+        output.appendLine('Fetching ' + browser_download_url);
         const abortController = new AbortController();
         const timeout = setTimeout(() => {
             abortController.abort();
         }, timeoutMs);
         let download = await fetch(browser_download_url, {
             signal: abortController.signal,
-        }).catch(err => {
-            console.log(err);
+        }).catch((err) => {
+            output.appendLine(err);
             throw new Error(
                 `Language server download timed out after ${timeoutMs.toFixed(
                     2
@@ -338,7 +343,7 @@ async function getLatestLanguageServer(
         const languageServerAsset = ctx.asAbsolutePath(
             path.join('server', 'install', latest, languageServerAssetName)
         );
-        console.log(`Writing ${languageServerAsset}`);
+        output.appendLine(`Writing ${languageServerAsset}`);
         if (!fs.existsSync(path.dirname(languageServerAsset))) {
             fs.mkdirSync(path.dirname(languageServerAsset), {
                 recursive: true,
@@ -351,11 +356,11 @@ async function getLatestLanguageServer(
             });
             download.body.pipe(dest);
             dest.on('finish', () => {
-                console.log('Server download complete');
+                output.appendLine('Server download complete');
                 resolve();
             });
             dest.on('error', (err: any) => {
-                console.log('Server download error');
+                output.appendLine('Server download error');
                 reject(err);
             });
         });
@@ -364,25 +369,27 @@ async function getLatestLanguageServer(
             const targetDir = ctx.asAbsolutePath(
                 path.join('server', 'vhdl_ls', latest)
             );
-            console.log(`Extracting ${languageServerAsset} to ${targetDir}`);
+            output.appendLine(
+                `Extracting ${languageServerAsset} to ${targetDir}`
+            );
             if (!fs.existsSync(targetDir)) {
                 fs.mkdirSync(targetDir, { recursive: true });
             }
-            extract(languageServerAsset, { dir: targetDir }, err => {
+            extract(languageServerAsset, { dir: targetDir }, (err) => {
                 try {
                     fs.removeSync(
                         ctx.asAbsolutePath(path.join('server', 'install'))
                     );
                 } catch {}
                 if (err) {
-                    console.log('Error when extracting server');
-                    console.log(err);
+                    output.appendLine('Error when extracting server');
+                    output.appendLine(err);
                     try {
                         fs.removeSync(targetDir);
                     } catch {}
                     reject(err);
                 } else {
-                    console.log('Server extracted');
+                    output.appendLine('Server extracted');
                     resolve();
                 }
             });
