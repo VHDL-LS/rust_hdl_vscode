@@ -90,6 +90,22 @@
 				"vhdlls.languageServerUserPath": {
 					"description": "Path to vhdl_ls language server executable, used when vhdlls.languageServer = \"user\"",
 					"type": "string"
+				},
+				"vhdlls.trace.server": {
+					"type": "string",
+					"scope": "window",
+					"enum": [
+						"off",
+						"messages",
+						"verbose"
+					],
+					"enumDescriptions": [
+						"No traces",
+						"Error only",
+						"Full log"
+					],
+					"default": "off",
+					"description": "Trace requests to the vhdl_ls language server (this is usually overly verbose and not recommended for regular users)"
 				}
 			}
 		},

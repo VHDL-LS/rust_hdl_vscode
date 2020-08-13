@@ -17,6 +17,7 @@ import * as lockfile from 'proper-lockfile';
 import AbortController from 'abort-controller';
 const exec = util.promisify(require('child_process').exec);
 const output = vscode.window.createOutputChannel('VHDL LS Client');
+const traceOutputChannel = vscode.window.createOutputChannel('VHDL LS Trace');
 
 import {
     LanguageClient,
@@ -103,6 +104,8 @@ export async function activate(ctx: ExtensionContext) {
     // Options to control the language client
     let clientOptions: LanguageClientOptions = {
         documentSelector: [{ scheme: 'file', language: 'vhdl' }],
+        initializationOptions: vscode.workspace.getConfiguration('vhdlls'),
+        traceOutputChannel,
     };
     if (workspace.workspaceFolders) {
         clientOptions.synchronize = {
@@ -117,7 +120,7 @@ export async function activate(ctx: ExtensionContext) {
 
     // Create the language client
     client = new LanguageClient(
-        'vhdl_ls',
+        'vhdlls',
         'VHDL LS',
         serverOptions,
         clientOptions
