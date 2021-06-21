@@ -601,5 +601,50 @@
 			"$0"
 		],
 		"description": "concurrent with select declaration"
+	},
+	"AXI-Stream Master Signals": {
+		"prefix": "axism",
+		"body": [
+			"-------------AXI4-Stream-Master--------------",
+			"-- Master Stream Ports. TVALID indicates that the master is driving a valid transfer, A transfer takes place when both TVALID and TREADY are asserted.",
+			"M_AXIS_TVALID\t: OUT\tSTD_LOGIC;",
+			"-- TDATA is the primary payload that is used to provide the data that is passing across the interface from the master.",
+			"M_AXIS_TDATA\t: OUT\tSTD_LOGIC_VECTOR(C_M_AXIS_TDATA_WIDTH-1 DOWNTO 0);",
+			"-- TREADY indicates that the slave can accept a transfer in the current cycle.",
+			"M_AXIS_TREADY\t: IN\tSTD_LOGIC$0",
+			"--------------------------------------------"
+			],
+		"description": "Signals for AXI-Stream Master"
+	},
+	"AXI-Stream Master Generics": {
+		"prefix": "axismgen",
+		"body": [
+			"-- Width of S_AXIS address bus. The slave accepts the read and write addresses of width C_M_AXIS_TDATA_WIDTH.",
+			"C_M_AXIS_TDATA_WIDTH\t: integer\t:= ${1:<axi-stream bus width>}$0"
+			],
+		"description": "Generics for AXI-Stream Master"
+	},
+	"AXI-Stream Sink Signals": {
+		"prefix": "axiss",
+		"body": [
+			"--------------AXI4-Stream-Sink--------------",
+			"-- Ready to accept data in",
+			"S_AXIS_TREADY\t: OUT \tSTD_LOGIC;",
+			"-- Data in",
+			"S_AXIS_TDATA\t: IN \tSTD_LOGIC_VECTOR(C_S_AXIS_TDATA_WIDTH-1 DOWNTO 0);",
+			"-- Data is in valid",
+			"S_AXIS_TVALID\t:\tIN\tSTD_LOGIC$0",
+			"--------------------------------------------"
+			],
+		"description": "Signals for AXI-Stream Sink"
+	},
+	"AXI-Stream Sink Generics": {
+		"prefix": "axissgen",
+		"body": [
+			"-- AXI4Stream sink: Data Width",
+			"C_S_AXIS_TDATA_WIDTH\t:\tinteger\t:= ${1:<axi-stream bus width>}$0"
+			],
+		"description": "Generics for AXI-Stream Sink"
 	}
+
 }
