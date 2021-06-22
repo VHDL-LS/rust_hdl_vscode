@@ -503,6 +503,11 @@
 		],
 		"description": "record declaration"
 	},
+	"Signal": {
+		"prefix": "signal",
+		"body": [ "signal $1 : $2 ${3|;,:= ;|}" ],
+		"description": "signal declaration"
+	},
 	"Signed": {
 		"prefix": "sign",
 		"body": [ "signed($1 ${2|downto,to|} $3)${4| := (others => '0');,;|}$0" ],
