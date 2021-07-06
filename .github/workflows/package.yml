@@ -11,8 +11,8 @@ jobs:
       - name: Download language server
         run: |
           ver=$(curl -s https://api.github.com/repos/kraigher/rust_hdl/releases/latest | grep -oP '"tag_name": "v\K(.*)(?=")')
-          wget -P temp https://github.com/kraigher/rust_hdl/releases/latest/download/vhdl_ls-x86_64-unknown-linux-gnu.zip
-          wget -P temp https://github.com/kraigher/rust_hdl/releases/latest/download/vhdl_ls-x86_64-pc-windows-msvc.zip
+          wget -P temp https://github.com/VHDL-LS/rust_hdl/releases/latest/download/vhdl_ls-x86_64-unknown-linux-gnu.zip
+          wget -P temp https://github.com/VHDL-LS/rust_hdl/releases/latest/download/vhdl_ls-x86_64-pc-windows-msvc.zip
           mkdir --parents server/vhdl_ls/$ver
           unzip temp/vhdl_ls-x86_64-unknown-linux-gnu.zip -d server/vhdl_ls/$ver
           unzip temp/vhdl_ls-x86_64-pc-windows-msvc.zip -d server/vhdl_ls/$ver
