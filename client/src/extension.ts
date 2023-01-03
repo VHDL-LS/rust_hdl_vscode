@@ -37,7 +37,7 @@ enum LanguageServerBinary {
 const isWindows = process.platform === 'win32';
 const languageServerName = isWindows
     ? 'vhdl_ls-x86_64-pc-windows-msvc'
-    : 'vhdl_ls-x86_64-unknown-linux-gnu';
+    : 'vhdl_ls-x86_64-unknown-linux-musl';
 const languageServerBinaryName = 'vhdl_ls';
 let languageServer: string;
 

@@ -14,11 +14,11 @@ jobs:
           wget -P temp https://github.com/VHDL-LS/rust_hdl/releases/latest/download/vhdl_ls-x86_64-unknown-linux-gnu.zip
           wget -P temp https://github.com/VHDL-LS/rust_hdl/releases/latest/download/vhdl_ls-x86_64-pc-windows-msvc.zip
           mkdir --parents server/vhdl_ls/$ver
-          unzip temp/vhdl_ls-x86_64-unknown-linux-gnu.zip -d server/vhdl_ls/$ver
+          unzip temp/vhdl_ls-x86_64-unknown-linux-musl.zip -d server/vhdl_ls/$ver
           unzip temp/vhdl_ls-x86_64-pc-windows-msvc.zip -d server/vhdl_ls/$ver
       - uses: actions/setup-node@v1
         with:
-          node-version: '10'
+          node-version: '16'
       - name: Install NPM packages
         run: |
           npm install
