@@ -1,5 +1,10 @@
 # Changelog
 
+
+## [0.4.0 - 2023-01-03
+
+- Change embedded language server for Linux from gnu to musl
+
 ## [0.3.2] - 2020-10-04
 
 - Fix automatic server update
