@@ -16,8 +16,8 @@ import util = require('util');
 import * as lockfile from 'proper-lockfile';
 import AbortController from 'abort-controller';
 const exec = util.promisify(require('child_process').exec);
-const output = vscode.window.createOutputChannel('VHDL LS Client');
-const traceOutputChannel = vscode.window.createOutputChannel('VHDL LS Trace');
+const output = vscode.window.createOutputChannel('VHDL-LS Client');
+const traceOutputChannel = vscode.window.createOutputChannel('VHDL-LS Trace');
 
 import {
     LanguageClient,
@@ -37,7 +37,7 @@ enum LanguageServerBinary {
 const isWindows = process.platform === 'win32';
 const languageServerName = isWindows
     ? 'vhdl_ls-x86_64-pc-windows-msvc'
-    : 'vhdl_ls-x86_64-unknown-linux-gnu';
+    : 'vhdl_ls-x86_64-unknown-linux-musl';
 const languageServerBinaryName = 'vhdl_ls';
 let languageServer: string;
 
@@ -278,7 +278,7 @@ function getServerOptionsSystemPath() {
 }
 
 const rustHdl = {
-    owner: 'kraigher',
+    owner: 'VHDL-LS',
     repo: 'rust_hdl',
 };
 
@@ -353,7 +353,7 @@ async function getLatestLanguageServer(
             });
         }
 
-        await new Promise((resolve, reject) => {
+        await new Promise<void>((resolve, reject) => {
             const dest = fs.createWriteStream(languageServerAsset, {
                 autoClose: true,
             });
@@ -368,7 +368,7 @@ async function getLatestLanguageServer(
             });
         });
 
-        await new Promise((resolve, reject) => {
+        await new Promise<void>((resolve, reject) => {
             const targetDir = ctx.asAbsolutePath(
                 path.join('server', 'vhdl_ls', latest)
             );
