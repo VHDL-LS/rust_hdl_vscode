@@ -3,31 +3,20 @@ VHDL Language Server and Support for Visual Studio Code.
 
 [![Join the chat at https://gitter.im/rust_hdl/Lobby](https://badges.gitter.im/rust_hdl/Lobby.svg)](https://gitter.im/rust_hdl/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  
 
-## Features
-- VHDL-2008 parser
-- Syntax checks
-- Syntax highlighting
-- Semantic analysis (see [Rust HDL](https://github.com/kraigher/rust_hdl#vhdl-language-server) for details)
-- Library mapping
-
-## Language Server
-VHDL LS uses the [Rust HDL](https://github.com/kraigher/rust_hdl#vhdl-language-server) 
-Language Server. Pre-compiled binaries are provided with the extension but the server  
-can also be loaded from either the system path or using Docker depending
-on the value of the `vhdlls.languageServer` property.
-- `embedded`: Use the embedded binary.
-- `user`: Use path provided by user in `vhdlls.languageServerUserPath` property.
-- `systemPath`: Run `vhdl_ls` from path.
-- `docker`: Use [docker image](https://hub.docker.com/r/kraigher/vhdl_ls) (Only supports files below workspace root)
-
-**NOTE:** On Linux, it may be necessary to set -x on the vhdl_ls binary.  
-
-For instructions on compiling the language server, see 
-[Rust HDL](https://github.com/kraigher/rust_hdl)
+### Features
+- Live syntax and type checking 
+- Finds missing and duplicate declarations
+- Goto-definition/declaration (also in presence of overloading)
+- Find-all-references (also in presence of overloading)
+- Goto-implementation
+  - From component declaration to matching entity by default binding
+  - From entity to matching component declaration by default binding
+- Hovering symbols reveals more information
 
 ## Configuration
-The language server uses a configuration file in the [TOML](https://github.com/toml-lang/toml) format named `vhdl_ls.toml`.
-The file contains the library mapping of all files within the project. Files outside of the project without library mapping are checked for syntax errors only.  
+The language server needs to know the library mapping of the VHDL files in the project, for this purpose it reads a configuration file in the [TOML](https://github.com/toml-lang/toml) format named `vhdl_ls.toml`.
+The file contains the library mapping of all files within the project and should be located in the workspace root. 
+Files outside of the project without library mapping are checked for syntax errors only.  
   
 `vhdl_ls` will load configuration files in the following order of priority (first to last):
 1. A file named `.vhdl_ls.toml` in the user home folder.
@@ -41,29 +30,46 @@ Library definitions in later files redefines those from previously loaded files.
 ```toml
 # File names are either absolute or relative to the parent folder of the
 # vhdl_ls.toml file and supports glob-style patterns.
+
 [libraries]
+
+# Defines library lib2
 lib2.files = [
   'pkg2.vhd',
   'src/**/*.vhd',
 ]
+
+# Defines library lib1
 lib1.files = [
   'pkg1.vhd',
   'tb_ent.vhd',
 ]
 ```
 
+## Technology under the hood
+This extension is based on the [VHDL-LS](https://github.com/VHDL-LS/rust_hdl#vhdl-language-server) Language Server. 
+Pre-compiled binaries for Linux and Windows are provided with the extension.
+
+The server can also be loaded from either the system path or Docker depending
+on the value of the `vhdlls.languageServer` property.
+- `embedded`: Use the embedded binary.
+- `user`: Use path provided by user in `vhdlls.languageServerUserPath` property.
+- `systemPath`: Run `vhdl_ls` from path.
+- `docker`: Use [docker image](https://hub.docker.com/r/kraigher/vhdl_ls) (Only supports files below workspace root)
+
+**NOTE:** On Linux, it may be necessary to set -x on the vhdl_ls binary.  
+
 ## Issues
-Issues can be reported at [VHDL LS](https://github.com/Bochlin/rust_hdl_vscode)  
-As VHDL LS uses the Rust HDL language server, issues related to syntax and
-semantic checks should be reported directly to
-[Rust HDL](https://github.com/kraigher/rust_hdl)  
+Issues related to the extension can be reported at [VHDL LS - VSCode](https://github.com/Bochlin/rust_hdl_vscode) repository.
+
+Issues related to the VHDL language support and language server featuresshould be reported directly to [VHDL-LS](https://github.com/VHDL-LS/rust_hdl#vhdl-language-server)
 
 ## Syntax coloring
 Syntax coloring is based on the textmate [vhdl.tmbundle](https://github.com/textmate/vhdl.tmbundle)  
 
 ## Licenses
-The VSCode extension `VHDL LS` is available under the MIT license.
+The VSCode extension is available under the MIT license.
 
-The [Rust HDL](https://github.com/kraigher/rust_hdl#vhdl-language-server) 
+The [VHDL-LS](https://github.com/VHDL-LS/rust_hdl#vhdl-language-server)
 VHDL language server is available under the Mozilla Public
 License, v. 2.0.
