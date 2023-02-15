@@ -1,8 +1,6 @@
 # VHDL Language Server/Support
 VHDL Language Server and Support for Visual Studio Code.  
 
-[![Join the chat at https://gitter.im/rust_hdl/Lobby](https://badges.gitter.im/rust_hdl/Lobby.svg)](https://gitter.im/rust_hdl/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  
-
 ### Features
 - Live syntax and type checking 
 - Finds missing and duplicate declarations
@@ -63,6 +61,8 @@ on the value of the `vhdlls.languageServer` property.
 Issues related to the extension can be reported at [VHDL LS - VSCode](https://github.com/Bochlin/rust_hdl_vscode) repository.
 
 Issues related to the VHDL language support and language server featuresshould be reported directly to [VHDL-LS](https://github.com/VHDL-LS/rust_hdl#vhdl-language-server)
+
+[![Chat](https://img.shields.io/matrix/VHDL-LS:matrix.org)](https://matrix.to/#/#VHDL-LS:matrix.org)
 
 ## Syntax coloring
 Syntax coloring is based on the textmate [vhdl.tmbundle](https://github.com/textmate/vhdl.tmbundle)  
