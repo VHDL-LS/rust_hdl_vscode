@@ -11,6 +11,7 @@ VHDL Language Server and Support for Visual Studio Code.
   - From entity to matching component declaration by default binding
 - Hovering symbols reveals more information
 - Renaming symbols
+- Finding workspace symbols
 
 ## Configuration
 The language server needs to know the library mapping of the VHDL files in the project, for this purpose it reads a configuration file in the [TOML](https://github.com/toml-lang/toml) format named `vhdl_ls.toml`.
