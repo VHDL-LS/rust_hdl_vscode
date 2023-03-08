@@ -407,7 +407,7 @@
 				</dict>
 				<dict>
 					<key>match</key>
-					<string>\b(?i:file_(canseek|close|mode|open|position|seek|size|state|truncate))\b</string>
+					<string>\b(?i:file_(canseek|close|mode|open|position|rewind|seek|size|state|truncate))\b</string>
 					<key>name</key>
 					<string>support.function.textio.file.vhdl</string>
 				</dict>
