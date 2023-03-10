@@ -11,7 +11,7 @@
 		<string>vho</string>
 	</array>
 	<key>name</key>
-	<string>VHDL-2019</string>
+	<string>VHDL</string>
 	<key>patterns</key>
 	<array>
 		<dict>
@@ -537,7 +537,7 @@
 		</dict>
 	</dict>
 	<key>scopeName</key>
-	<string>source.vhdl2019</string>
+	<string>source.vhdl</string>
 	<key>uuid</key>
 	<string>B582CBD9-DEFE-4CEC-96B7-11CABB74186D</string>
 </dict>
