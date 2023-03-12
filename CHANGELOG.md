@@ -1,7 +1,9 @@
 # Changelog
+## [0.4.1] - 2023-03-12
 
+- Updated README
 
-## [0.4.0 - 2023-01-03
+## [0.4.0] - 2023-01-03
 
 - Change embedded language server for Linux from gnu to musl
 
