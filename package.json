@@ -135,7 +135,7 @@
 		"tslint": "^5.20.0",
 		"typescript": "^3.9.7",
 		"@vscode/vsce": "^2.15",
-		"webpack": "^5.46.0",
+		"webpack": "^5.76.0",
 		"webpack-cli": "^5.0"
 	}
 }
