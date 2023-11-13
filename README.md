@@ -45,6 +45,12 @@ lib1.files = [
   'pkg1.vhd',
   'tb_ent.vhd',
 ]
+
+# Libraries can be marked as third-party to disable some analysis warnings, such as unused declarations
+UNISIM.files = [
+  'C:\Xilinx\Vivado\2023.1\data\vhdl\src\unisims\unisim_VCOMP.vhd',
+]
+UNISIM.is_third_party = true
 ```
 
 ## Technology under the hood
