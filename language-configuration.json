@@ -17,7 +17,13 @@
         ["\\", "\\"]
     ],
     "indentationRules": {
-        "increaseIndentPattern": "\\b(begin|is|port|else|loop|generate|then)\\b",
-        "decreaseIndentPattern": "^\\s*(elsif|else|end|begin)\\b"
+        "increaseIndentPattern": {
+            "pattern": "\\b(begin|is|port|else|loop|generate|then)\\b",
+            "flags": "i"
+        },
+        "decreaseIndentPattern": {
+            "pattern": "^\\s*(elsif|else|end|begin)\\b",
+            "flags": "i"
+        }
     }
 }
