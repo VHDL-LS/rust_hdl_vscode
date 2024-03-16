@@ -27,6 +27,10 @@
 	"engines": {
 		"vscode": "^1.75.0"
 	},
+	"activationEvents": [
+		"onLanguage:vhdl",
+		"onCommand:vhdlls.restart"
+	],
 	"main": "./dist/extension",
 	"contributes": {
 		"languages": [
