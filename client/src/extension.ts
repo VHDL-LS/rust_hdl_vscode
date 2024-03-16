@@ -6,24 +6,22 @@
 'use strict';
 import extract = require('extract-zip');
 import * as fs from 'fs-extra';
-import fetch from 'node-fetch';
-import Octokit = require('@octokit/rest');
+import { Octokit } from 'octokit';
 import * as path from 'path';
 import semver = require('semver');
-import vscode = require('vscode');
-import { workspace, ExtensionContext, window } from 'vscode';
+import { ExtensionContext, window, workspace, commands } from 'vscode';
 import util = require('util');
 import * as lockfile from 'proper-lockfile';
-import AbortController from 'abort-controller';
 const exec = util.promisify(require('child_process').exec);
-const output = vscode.window.createOutputChannel('VHDL-LS Client');
-const traceOutputChannel = vscode.window.createOutputChannel('VHDL-LS Trace');
+const output = window.createOutputChannel('VHDL-LS Client');
+const traceOutputChannel = window.createOutputChannel('VHDL-LS Trace');
+import { Readable } from 'stream';
 
 import {
     LanguageClient,
     LanguageClientOptions,
     ServerOptions,
-} from 'vscode-languageclient';
+} from 'vscode-languageclient/node';
 
 let client: LanguageClient;
 
@@ -68,7 +66,6 @@ export async function activate(ctx: ExtensionContext) {
 
     // Get language server configuration and command to start server
 
-    let workspace = vscode.workspace;
     let languageServerBinary = workspace
         .getConfiguration()
         .get('vhdlls.languageServer');
@@ -104,7 +101,7 @@ export async function activate(ctx: ExtensionContext) {
     // Options to control the language client
     let clientOptions: LanguageClientOptions = {
         documentSelector: [{ scheme: 'file', language: 'vhdl' }],
-        initializationOptions: vscode.workspace.getConfiguration('vhdlls'),
+        initializationOptions: workspace.getConfiguration('vhdlls'),
         traceOutputChannel,
     };
     if (workspace.workspaceFolders) {
@@ -127,19 +124,15 @@ export async function activate(ctx: ExtensionContext) {
     );
 
     // Start the client. This will also launch the server
-    let languageServerDisposable = client.start();
+    await client.start();
 
     // Register command to restart language server
-    ctx.subscriptions.push(languageServerDisposable);
     ctx.subscriptions.push(
-        vscode.commands.registerCommand('vhdlls.restart', async () => {
+        commands.registerCommand('vhdlls.restart', async () => {
             const MSG = 'Restarting VHDL LS';
             output.appendLine(MSG);
             window.showInformationMessage(MSG);
-            await client.stop();
-            languageServerDisposable.dispose();
-            languageServerDisposable = client.start();
-            ctx.subscriptions.push(languageServerDisposable);
+            await client.restart();
         })
     );
 
@@ -199,7 +192,7 @@ async function getServerOptionsDocker() {
     output.append(stdout);
     output.append(stderr);
 
-    let wsPath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+    let wsPath = workspace.workspaceFolders[0].uri.fsPath;
     let mountPath = wsPath;
     if (isWindows) {
         wsPath = wsPath.replace(/\\/g, '/');
@@ -249,8 +242,8 @@ function getServerOptionsEmbedded(context: ExtensionContext) {
     return serverOptions;
 }
 
-function getServerOptionsUser(context: ExtensionContext) {
-    let serverCommand: string = vscode.workspace
+function getServerOptionsUser(_: ExtensionContext) {
+    let serverCommand: string = workspace
         .getConfiguration()
         .get('vhdlls.languageServerUserPath');
     let serverOptions: ServerOptions = {
@@ -288,7 +281,7 @@ async function getLatestLanguageServer(
 ) {
     // Get current and latest version
     const octokit = new Octokit({ userAgent: 'rust_hdl_vscode' });
-    let latestRelease = await octokit.repos.getLatestRelease({
+    let latestRelease = await octokit.rest.repos.getLatestRelease({
         owner: rustHdl.owner,
         repo: rustHdl.repo,
     });
@@ -327,7 +320,7 @@ async function getLatestLanguageServer(
 
         output.appendLine('Fetching ' + browser_download_url);
         const abortController = new AbortController();
-        const timeout = setTimeout(() => {
+        setTimeout(() => {
             abortController.abort();
         }, timeoutMs);
         let download = await fetch(browser_download_url, {
@@ -357,7 +350,7 @@ async function getLatestLanguageServer(
             const dest = fs.createWriteStream(languageServerAsset, {
                 autoClose: true,
             });
-            download.body.pipe(dest);
+            Readable.fromWeb(download.body).pipe(dest);
             dest.on('finish', () => {
                 output.appendLine('Server download complete');
                 resolve();
@@ -378,24 +371,34 @@ async function getLatestLanguageServer(
             if (!fs.existsSync(targetDir)) {
                 fs.mkdirSync(targetDir, { recursive: true });
             }
-            extract(languageServerAsset, { dir: targetDir }, (err) => {
-                try {
-                    fs.removeSync(
-                        ctx.asAbsolutePath(path.join('server', 'install'))
-                    );
-                } catch {}
-                if (err) {
+            extract(languageServerAsset, { dir: targetDir })
+                .then(() => {
+                    output.appendLine(`Server extracted to ${targetDir}`);
+                    resolve();
+                })
+                .catch((err) => {
                     output.appendLine('Error when extracting server');
                     output.appendLine(err);
                     try {
                         fs.removeSync(targetDir);
-                    } catch {}
+                    } catch (err) {
+                        output.appendLine(`Cannot remove ${targetDir}: ${err}`);
+                    }
                     reject(err);
-                } else {
-                    output.appendLine('Server extracted');
-                    resolve();
-                }
-            });
+                })
+                .finally(() => {
+                    try {
+                        fs.removeSync(
+                            ctx.asAbsolutePath(path.join('server', 'install'))
+                        );
+                    } catch (err) {
+                        output.appendLine(
+                            `Cannot remove ${ctx.asAbsolutePath(
+                                path.join('server', 'install')
+                            )}: ${err}`
+                        );
+                    }
+                });
         });
     }
     return Promise.resolve();

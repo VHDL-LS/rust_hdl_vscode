@@ -7,7 +7,7 @@ jobs:
     name: Package
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
       - name: Download language server
         run: |
           ver=$(curl -s https://api.github.com/repos/VHDL-LS/rust_hdl/releases/latest | grep -oP '"tag_name": "v\K(.*)(?=")')
@@ -16,9 +16,9 @@ jobs:
           mkdir --parents server/vhdl_ls/$ver
           unzip temp/vhdl_ls-x86_64-unknown-linux-musl.zip -d server/vhdl_ls/$ver
           unzip temp/vhdl_ls-x86_64-pc-windows-msvc.zip -d server/vhdl_ls/$ver
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: '20'
       - name: Install NPM packages
         run: |
           npm install
@@ -36,13 +36,13 @@ jobs:
     needs: package
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v1
+      - uses: actions/download-artifact@v4
         with:
           name: vhdl-ls
           path: vhdl-ls
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: '20'
       - name: Print env
         run: |
           echo ${GITHUB_REF:11}
