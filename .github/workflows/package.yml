@@ -25,7 +25,7 @@ jobs:
           npm install -g vsce
       - run: vsce package
       - run: mkdir vhdl-ls && cp *.vsix vhdl-ls
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v4
         with:
           name: vhdl-ls
           path: vhdl-ls
