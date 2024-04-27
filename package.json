@@ -112,12 +112,10 @@
 					"description": "Defines how the server handles files that are not part of the vhdl_ls.toml configuration file",
 					"enum": [
 						"ignore",
-						"parse",
 						"analyze"
 					],
 					"enumDescriptions": [
 						"Ignore any non-project file",
-						"Only parse the files, do not analyze",
 						"Add the file to an anonymous library and analyze that file"
 					],
 					"default": "analyze"
