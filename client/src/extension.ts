@@ -101,7 +101,7 @@ export async function activate(ctx: ExtensionContext) {
     // Options to control the language client
     let clientOptions: LanguageClientOptions = {
         documentSelector: [{ scheme: 'file', language: 'vhdl' }],
-        initializationOptions: workspace.getConfiguration('vhdlls'),
+        initializationOptions: () => workspace.getConfiguration('vhdlls'),
         traceOutputChannel,
     };
     if (workspace.workspaceFolders) {
