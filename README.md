@@ -53,6 +53,9 @@ UNISIM.files = [
 UNISIM.is_third_party = true
 ```
 
+### Non-project files
+By default, files that are not part of the project are added and analyzed as part of an anonymous library. You can disable this behaviour by changing the `vhdlls.nonProjectFiles` setting from `analyze` to `ignore`. Note that changing this setting requires a restart of the langauge server to become effective.
+
 ## Technology under the hood
 This extension is based on the [VHDL-LS](https://github.com/VHDL-LS/rust_hdl#vhdl-language-server) Language Server. 
 Pre-compiled binaries for Linux and Windows are provided with the extension.

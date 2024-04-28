@@ -106,6 +106,19 @@
 					],
 					"default": "off",
 					"description": "Trace requests to the vhdl_ls language server (this is usually overly verbose and not recommended for regular users)"
+				},
+				"vhdlls.nonProjectFiles": {
+					"type": "string",
+					"description": "Defines how the server handles files that are not part of the vhdl_ls.toml configuration file",
+					"enum": [
+						"ignore",
+						"analyze"
+					],
+					"enumDescriptions": [
+						"Ignore any non-project file",
+						"Add the file to an anonymous library and analyze that file"
+					],
+					"default": "analyze"
 				}
 			}
 		},
