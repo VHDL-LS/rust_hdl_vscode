@@ -40,32 +40,7 @@ const languageServerBinaryName = 'vhdl_ls';
 let languageServer: string;
 
 export async function activate(ctx: ExtensionContext) {
-    const languageServerDir = ctx.asAbsolutePath(
-        path.join('server', 'vhdl_ls')
-    );
-    output.appendLine(
-        'Checking for language server executable in ' + languageServerDir
-    );
-    let languageServerVersion = embeddedVersion(languageServerDir);
-    if (languageServerVersion == '0.0.0') {
-        output.appendLine('No language server installed');
-        window.showInformationMessage('Downloading language server...');
-        await getLatestLanguageServer(60000, ctx);
-        languageServerVersion = embeddedVersion(languageServerDir);
-    } else {
-        output.appendLine('Found version ' + languageServerVersion);
-    }
-    languageServer = path.join(
-        'server',
-        'vhdl_ls',
-        languageServerVersion,
-        languageServerName,
-        'bin',
-        languageServerBinaryName + (isWindows ? '.exe' : '')
-    );
-
     // Get language server configuration and command to start server
-
     let languageServerBinary = workspace
         .getConfiguration()
         .get('vhdlls.languageServer');
@@ -73,8 +48,58 @@ export async function activate(ctx: ExtensionContext) {
     let serverOptions: ServerOptions;
     switch (lsBinary) {
         case 'embedded':
-            serverOptions = getServerOptionsEmbedded(ctx);
             output.appendLine('Using embedded language server');
+            let desiredVersionString: string = workspace
+                .getConfiguration()
+                .get('vhdlls.embeddedVersion');
+            const languageServerDir = ctx.asAbsolutePath(
+                path.join('server', 'vhdl_ls')
+            );
+
+            if (desiredVersionString === 'latest') {
+                output.appendLine('Checking for updates...');
+                lockfile
+                    .lock(ctx.asAbsolutePath('server'), {
+                        lockfilePath: ctx.asAbsolutePath(
+                            path.join('server', '.lock')
+                        ),
+                    })
+                    .then((release: () => void) => {
+                        getLanguageServer(null, 60000, ctx)
+                            .catch((err) => {
+                                output.appendLine(err);
+                            })
+                            .finally(() => {
+                                output.appendLine(
+                                    'Language server update finished.'
+                                );
+                                return release();
+                            });
+                    });
+            } else {
+                let currentVersion = semver.coerce(
+                    embeddedVersion(languageServerDir)
+                );
+                let desiredVersion = semver.coerce(desiredVersionString);
+                if (desiredVersion !== currentVersion) {
+                    await getLanguageServer(desiredVersionString, 60000, ctx);
+                }
+            }
+
+            output.appendLine(
+                'Checking for language server executable in ' +
+                    languageServerDir
+            );
+            let languageServerVersion = embeddedVersion(languageServerDir);
+            languageServer = path.join(
+                'server',
+                'vhdl_ls',
+                languageServerVersion,
+                languageServerName,
+                'bin',
+                languageServerBinaryName + (isWindows ? '.exe' : '')
+            );
+            serverOptions = getServerOptionsEmbedded(ctx);
             break;
 
         case 'user':
@@ -135,22 +160,6 @@ export async function activate(ctx: ExtensionContext) {
             await client.restart();
         })
     );
-
-    output.appendLine('Checking for updates...');
-    lockfile
-        .lock(ctx.asAbsolutePath('server'), {
-            lockfilePath: ctx.asAbsolutePath(path.join('server', '.lock')),
-        })
-        .then((release: () => void) => {
-            getLatestLanguageServer(60000, ctx)
-                .catch((err) => {
-                    output.appendLine(err);
-                })
-                .finally(() => {
-                    output.appendLine('Language server update finished.');
-                    return release();
-                });
-        });
 
     output.appendLine('Language server started');
 }
@@ -275,131 +284,187 @@ const rustHdl = {
     repo: 'rust_hdl',
 };
 
-async function getLatestLanguageServer(
+async function getLanguageServer(
+    versionTag: string | undefined,
     timeoutMs: number,
     ctx: ExtensionContext
 ) {
     // Get current and latest version
-    const octokit = new Octokit({ userAgent: 'rust_hdl_vscode' });
-    let latestRelease = await octokit.rest.repos.getLatestRelease({
-        owner: rustHdl.owner,
-        repo: rustHdl.repo,
+    let current = await getCurrentEmbeddedVersion(ctx);
+
+    output.appendLine(`Current vhdl_ls version: ${current}`);
+
+    const { release, version } = await getReleaseAndVersion(
+        versionTag,
+        current
+    );
+
+    const languageServerAsset = await downloadLanguageServer(
+        release,
+        timeoutMs,
+        ctx,
+        version
+    );
+
+    await installLanguageServer(ctx, version, languageServerAsset);
+}
+
+async function installLanguageServer(
+    ctx: ExtensionContext,
+    version: string,
+    languageServerAsset: string
+) {
+    await new Promise<void>((resolve, reject) => {
+        const targetDir = ctx.asAbsolutePath(
+            path.join('server', 'vhdl_ls', version)
+        );
+        output.appendLine(`Extracting ${languageServerAsset} to ${targetDir}`);
+        if (!fs.existsSync(targetDir)) {
+            fs.mkdirSync(targetDir, { recursive: true });
+        }
+        extract(languageServerAsset, { dir: targetDir })
+            .then(() => {
+                output.appendLine(`Server extracted to ${targetDir}`);
+                resolve();
+            })
+            .catch((err) => {
+                output.appendLine('Error when extracting server');
+                output.appendLine(err);
+                try {
+                    fs.removeSync(targetDir);
+                } catch (err) {
+                    output.appendLine(`Cannot remove ${targetDir}: ${err}`);
+                }
+                reject(err);
+            })
+            .finally(() => {
+                try {
+                    fs.removeSync(
+                        ctx.asAbsolutePath(path.join('server', 'install'))
+                    );
+                } catch (err) {
+                    output.appendLine(
+                        `Cannot remove ${ctx.asAbsolutePath(
+                            path.join('server', 'install')
+                        )}: ${err}`
+                    );
+                }
+            });
     });
-    if (latestRelease.status != 200) {
-        throw new Error('Status 200 return when getting latest release');
+}
+
+async function downloadLanguageServer(
+    release: any,
+    timeoutMs: number,
+    ctx: ExtensionContext,
+    version: string
+) {
+    const languageServerAssetName = languageServerName + '.zip';
+    let browser_download_url = release.data.assets.filter(
+        (asset: { name: string }) => asset.name == languageServerAssetName
+    )[0].browser_download_url;
+    if (browser_download_url.length == 0) {
+        throw new Error(
+            `No asset with name ${languageServerAssetName} in release.`
+        );
     }
+
+    output.appendLine('Fetching ' + browser_download_url);
+    const abortController = new AbortController();
+    setTimeout(() => {
+        abortController.abort();
+    }, timeoutMs);
+    let download = await fetch(browser_download_url, {
+        signal: abortController.signal,
+    }).catch((err) => {
+        output.appendLine(err);
+        throw new Error(
+            `Language server download timed out after ${timeoutMs.toFixed(
+                2
+            )} seconds.`
+        );
+    });
+    if (download.status != 200) {
+        throw new Error('Download returned status != 200');
+    }
+    const languageServerAsset = ctx.asAbsolutePath(
+        path.join('server', 'install', version, languageServerAssetName)
+    );
+    output.appendLine(`Writing ${languageServerAsset}`);
+    if (!fs.existsSync(path.dirname(languageServerAsset))) {
+        fs.mkdirSync(path.dirname(languageServerAsset), {
+            recursive: true,
+        });
+    }
+
+    await new Promise<void>((resolve, reject) => {
+        const dest = fs.createWriteStream(languageServerAsset, {
+            autoClose: true,
+        });
+        Readable.fromWeb(download.body).pipe(dest);
+        dest.on('finish', () => {
+            output.appendLine('Server download complete');
+            resolve();
+        });
+        dest.on('error', (err: any) => {
+            output.appendLine('Server download error');
+            reject(err);
+        });
+    });
+    return languageServerAsset;
+}
+
+/// Returns the current embedded language server version as string.
+async function getCurrentEmbeddedVersion(
+    ctx: ExtensionContext
+): Promise<string> {
     let current: string;
     if (languageServer) {
-        let { stdout, stderr } = await exec(
-            `"${ctx.asAbsolutePath(languageServer)}" --version`
-        );
+        let languageServerPath = ctx.asAbsolutePath(languageServer);
+        let { stdout } = await exec(`"${languageServerPath}" --version`);
         current = semver.valid(semver.coerce(stdout.split(' ', 2)[1]));
     } else {
         current = '0.0.0';
     }
+    return current;
+}
 
-    let latest = semver.valid(semver.coerce(latestRelease.data.name));
-    output.appendLine(`Current vhdl_ls version: ${current}`);
-    output.appendLine(`Latest vhdl_ls version: ${latest}`);
-
-    // Download new version if available
-    if (semver.prerelease(latest)) {
-        output.appendLine('Latest version is pre-release, skipping');
-    } else if (semver.lte(latest, current)) {
-        output.appendLine('Language server is up-to-date');
+async function getReleaseAndVersion(
+    versionTag: string | undefined,
+    current: string
+): Promise<{
+    release: any;
+    version: string;
+}> {
+    const octokit = new Octokit({ userAgent: 'rust_hdl_vscode' });
+    let release: any;
+    let version: string;
+    if (!versionTag) {
+        release = await octokit.rest.repos.getLatestRelease({
+            owner: rustHdl.owner,
+            repo: rustHdl.repo,
+        });
+        version = semver.valid(semver.coerce(release.data.name));
+        if (semver.prerelease(version)) {
+            output.appendLine('Latest version is pre-release, skipping');
+            return;
+        } else if (semver.lte(version, current)) {
+            output.appendLine('Language server is up-to-date');
+            return;
+        }
     } else {
-        const languageServerAssetName = languageServerName + '.zip';
-        let browser_download_url = latestRelease.data.assets.filter(
-            (asset) => asset.name == languageServerAssetName
-        )[0].browser_download_url;
-        if (browser_download_url.length == 0) {
-            throw new Error(
-                `No asset with name ${languageServerAssetName} in release.`
-            );
-        }
-
-        output.appendLine('Fetching ' + browser_download_url);
-        const abortController = new AbortController();
-        setTimeout(() => {
-            abortController.abort();
-        }, timeoutMs);
-        let download = await fetch(browser_download_url, {
-            signal: abortController.signal,
-        }).catch((err) => {
-            output.appendLine(err);
-            throw new Error(
-                `Language server download timed out after ${timeoutMs.toFixed(
-                    2
-                )} seconds.`
-            );
+        release = await octokit.rest.repos.getReleaseByTag({
+            owner: rustHdl.owner,
+            repo: rustHdl.repo,
+            tag: versionTag,
         });
-        if (download.status != 200) {
-            throw new Error('Download returned status != 200');
-        }
-        const languageServerAsset = ctx.asAbsolutePath(
-            path.join('server', 'install', latest, languageServerAssetName)
-        );
-        output.appendLine(`Writing ${languageServerAsset}`);
-        if (!fs.existsSync(path.dirname(languageServerAsset))) {
-            fs.mkdirSync(path.dirname(languageServerAsset), {
-                recursive: true,
-            });
-        }
-
-        await new Promise<void>((resolve, reject) => {
-            const dest = fs.createWriteStream(languageServerAsset, {
-                autoClose: true,
-            });
-            Readable.fromWeb(download.body).pipe(dest);
-            dest.on('finish', () => {
-                output.appendLine('Server download complete');
-                resolve();
-            });
-            dest.on('error', (err: any) => {
-                output.appendLine('Server download error');
-                reject(err);
-            });
-        });
-
-        await new Promise<void>((resolve, reject) => {
-            const targetDir = ctx.asAbsolutePath(
-                path.join('server', 'vhdl_ls', latest)
-            );
-            output.appendLine(
-                `Extracting ${languageServerAsset} to ${targetDir}`
-            );
-            if (!fs.existsSync(targetDir)) {
-                fs.mkdirSync(targetDir, { recursive: true });
-            }
-            extract(languageServerAsset, { dir: targetDir })
-                .then(() => {
-                    output.appendLine(`Server extracted to ${targetDir}`);
-                    resolve();
-                })
-                .catch((err) => {
-                    output.appendLine('Error when extracting server');
-                    output.appendLine(err);
-                    try {
-                        fs.removeSync(targetDir);
-                    } catch (err) {
-                        output.appendLine(`Cannot remove ${targetDir}: ${err}`);
-                    }
-                    reject(err);
-                })
-                .finally(() => {
-                    try {
-                        fs.removeSync(
-                            ctx.asAbsolutePath(path.join('server', 'install'))
-                        );
-                    } catch (err) {
-                        output.appendLine(
-                            `Cannot remove ${ctx.asAbsolutePath(
-                                path.join('server', 'install')
-                            )}: ${err}`
-                        );
-                    }
-                });
-        });
+        version = semver.valid(semver.coerce(release.data.name));
     }
-    return Promise.resolve();
+    if (release.status != 200) {
+        throw new Error('Status != 200 when getting latest release');
+    }
+    return {
+        release: release,
+        version: version,
+    };
 }
