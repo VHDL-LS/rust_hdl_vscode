@@ -105,7 +105,7 @@
 			"component ${1:$TM_FILENAME_BASE} is",
 			"\tport (",
 			"\t\t${2:clk   : in std_logic;}",
-			"\t\t${3:reset : in std_logic;}",
+			"\t\t${3:reset : in std_logic}",
 			"\t\t$0",
 			"\t);",
 			"end component;"
@@ -210,7 +210,7 @@
 				"entity ${1:$TM_FILENAME_BASE} is",
 				"\tport (",
 				"\t\t${2:clk   : in std_logic;}",
-				"\t\t${3:reset : in std_logic;}",
+				"\t\t${3:reset : in std_logic}",
 				"\t\t$0",
 				"\t);",
 				"end entity;"
@@ -223,7 +223,7 @@
 				"entity ${1:$TM_FILENAME_BASE} is",
 				"\tport (",
 				"\t\t${2:clk   : in std_logic;}",
-				"\t\t${3:reset : in std_logic;}",
+				"\t\t${3:reset : in std_logic}",
 				"\t\t$0",
 				"\t);",
 				"end entity $1;",
