@@ -119,6 +119,10 @@
 						"Add the file to an anonymous library and analyze that file"
 					],
 					"default": "analyze"
+				},
+				"vhdlls.standardLibraries": {
+					"type": "string",
+					"description": "Defines the path where the VHDL standard libraries (ieee, std, ...) are located. If omitted, will search in pre-defined standard paths for these libraries"
 				}
 			}
 		},
