@@ -98,6 +98,16 @@ export async function activate(ctx: ExtensionContext) {
             break;
     }
 
+    let librariesLocation = workspace
+        .getConfiguration()
+        .get('vhdlls.standardLibraries');
+
+    if (lsBinary !== 'docker' && librariesLocation) {
+        const args = ['--libraries', librariesLocation as string];
+        serverOptions.run.args = args;
+        serverOptions.debug.args = args;
+    }
+
     // Options to control the language client
     let clientOptions: LanguageClientOptions = {
         documentSelector: [{ scheme: 'file', language: 'vhdl' }],
