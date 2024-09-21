@@ -87,8 +87,15 @@
 						"Use kraigher/vhdl_ls:latest image from Docker Hub"
 					]
 				},
+				"vhdlls.embeddedVersion": {
+					"markdownDescription": "The version to use for the embedded language server. Only valid when `#vhdlls.languageServer#` is set to `embedded`. Refer to [the GitHub releases page](https://github.com/VHDL-LS/rust_hdl/releases) for a list of available versions",
+					"type": "string",
+					"default": "latest",
+					"pattern": "^latest|(v(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?)$",
+					"patternErrorMessage": "Use a valid version (i.e., v0.80.0 or v0.78.2) or enter 'latest' to always use the latest version."
+				},
 				"vhdlls.languageServerUserPath": {
-					"description": "Path to vhdl_ls language server executable, used when vhdlls.languageServer = \"user\"",
+					"description": "Path to vhdl_ls language server executable, used when #`vhdlls.languageServer#` is \"user\"",
 					"type": "string"
 				},
 				"vhdlls.trace.server": {
