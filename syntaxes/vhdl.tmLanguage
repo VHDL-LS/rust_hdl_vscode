@@ -461,7 +461,7 @@
 				</dict>
 				<dict>
 					<key>match</key>
-					<string>\b(?i:signed|unsigned)\b</string>
+					<string>\b(?i:(unresolved_|u_)?(signed|unsigned))\b</string>
 					<key>name</key>
 					<string>support.type.ieee.numeric_std.vhdl</string>
 				</dict>
