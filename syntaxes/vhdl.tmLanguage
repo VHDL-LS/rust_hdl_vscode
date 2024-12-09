@@ -171,7 +171,7 @@
 				</dict>
 				<dict>
 					<key>match</key>
-					<string>(\d+)?[sSuU]?[dD]"[0-9uUxXzZwWlLhH\-]+"</string>
+					<string>(\d+)?[sSuU]?[dD]"[0-9_uUxXzZwWlLhH\-]+"</string>
 					<key>name</key>
 					<string>constant.numeric.quoted.double.string.decimal.vhdl</string>
 				</dict>
