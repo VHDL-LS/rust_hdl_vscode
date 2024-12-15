@@ -171,7 +171,7 @@
 				</dict>
 				<dict>
 					<key>match</key>
-					<string>(\d+)?[sSuU]?[dD]"[0-9uUxXzZwWlLhH\-]+"</string>
+					<string>(\d+)?[sSuU]?[dD]"[0-9_uUxXzZwWlLhH\-]+"</string>
 					<key>name</key>
 					<string>constant.numeric.quoted.double.string.decimal.vhdl</string>
 				</dict>
@@ -443,7 +443,7 @@
 			<array>
 				<dict>
 					<key>match</key>
-					<string>\b(?i:boolean|bit|character|severity_level|integer(_vector)?|real(_vector)?|time|delay_length|now|natural|positive|string|bit_vector|file_open_kind|file_open_status|fs|ps|ns|us|ms|sec|min|hr|severity_level|note|warning|error|failure)\b</string>
+					<string>\b(?i:boolean(_vector)?|bit(_vector)?|character|severity_level|integer(_vector)?|real(_vector)?|time(_vector)?|delay_length|now|natural|positive|string|file_open_kind|file_open_status|fs|ps|ns|us|ms|sec|min|hr|severity_level|note|warning|error|failure)\b</string>
 					<key>name</key>
 					<string>support.type.std.standard.vhdl</string>
 				</dict>
@@ -461,7 +461,7 @@
 				</dict>
 				<dict>
 					<key>match</key>
-					<string>\b(?i:signed|unsigned)\b</string>
+					<string>\b(?i:(unresolved_|u_)?(signed|unsigned))\b</string>
 					<key>name</key>
 					<string>support.type.ieee.numeric_std.vhdl</string>
 				</dict>
