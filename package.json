@@ -5,7 +5,7 @@
 	"author": "Henrik Bohlin",
 	"publisher": "hbohlin",
 	"license": "SEE LICENSE IN LICENSE",
-	"version": "0.7.0",
+	"version": "0.8.0",
 	"icon": "icon.png",
 	"repository": {
 		"type": "git",
@@ -123,6 +123,10 @@
 				"vhdlls.standardLibraries": {
 					"type": "string",
 					"description": "Defines the path where the VHDL standard libraries (ieee, std, ...) are located. If omitted, will search in pre-defined standard paths for these libraries"
+				},
+				"vhdlls.topEntity": {
+					"type": "string",
+					"description": "Default top-level entity for the design hierarchy view, in the form 'library.entity' (e.g. 'work.top'). If omitted, you will be prompted when opening the view."
 				}
 			}
 		},
@@ -131,8 +135,57 @@
 				"command": "vhdlls.restart",
 				"title": "Restart VHDL LS",
 				"category": "VHDL LS"
+			},
+			{
+				"command": "vhdlls.showHierarchy",
+				"title": "Show Design Hierarchy...",
+				"category": "VHDL LS",
+				"icon": "$(type-hierarchy)"
+			},
+			{
+				"command": "vhdlls.refreshHierarchy",
+				"title": "Refresh Design Hierarchy",
+				"category": "VHDL LS",
+				"icon": "$(refresh)"
+			},
+			{
+				"command": "vhdlls.setHierarchyTop",
+				"title": "Set Hierarchy Top Entity...",
+				"category": "VHDL LS",
+				"icon": "$(edit)"
 			}
-		]
+		],
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "vhdlHierarchyContainer",
+					"title": "VHDL Hierarchy",
+					"icon": "$(type-hierarchy)"
+				}
+			]
+		},
+		"views": {
+			"vhdlHierarchyContainer": [
+				{
+					"id": "vhdlHierarchy",
+					"name": "Design Hierarchy"
+				}
+			]
+		},
+		"menus": {
+			"view/title": [
+				{
+					"command": "vhdlls.refreshHierarchy",
+					"when": "view == vhdlHierarchy",
+					"group": "navigation"
+				},
+				{
+					"command": "vhdlls.setHierarchyTop",
+					"when": "view == vhdlHierarchy",
+					"group": "navigation"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "webpack --mode production",

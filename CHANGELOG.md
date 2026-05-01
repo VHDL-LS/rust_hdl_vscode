@@ -1,4 +1,17 @@
 # Changelog
+## [0.8.0] - unreleased
+
+- Added a **VHDL Hierarchy** activity-bar view that renders the project's
+  design instantiation tree.
+- Added the `vhdlls.showHierarchy`, `vhdlls.setHierarchyTop`, and
+  `vhdlls.refreshHierarchy` commands.
+- Added the `vhdlls.topEntity` setting, persisted across sessions.
+- The picker for the top entity is pre-populated from the language server
+  (real top candidates first, deepest subtree first).
+- Requires a vhdl_ls build that supports the custom `vhdl/designHierarchy`
+  and `vhdl/designHierarchyCandidates` requests; older servers display a
+  notice in the view.
+
 ## [0.5.0] - 2023-03-13
 - Improve syntax highligthing
 

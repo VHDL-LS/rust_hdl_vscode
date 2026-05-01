@@ -13,6 +13,34 @@ VHDL Language Server and Support for Visual Studio Code.
 - Renaming symbols
 - Finding workspace symbols
 - Viewing/finding document symbols
+- Design instantiation hierarchy view
+
+## Design Hierarchy
+
+The extension contributes an activity-bar view called **VHDL Hierarchy** that
+renders the project's design instantiation tree. Click a node to jump to the
+instantiation site; the title-bar buttons let you refresh the view and
+re-pick the top entity.
+
+Picking a top entity opens a quick-pick that lists every entity discovered
+in the project. The list is sorted with real top candidates first
+(entities not instantiated by anything else, deepest subtree first), so the
+intended top of your design typically sits at the top of the list. Free-text
+input is supported as a fallback. The chosen entity is persisted to the
+`vhdlls.topEntity` setting (workspace scope when available) and reloaded on
+the next session.
+
+Relevant settings:
+
+| Setting             | Description                                                                                  |
+|---------------------|----------------------------------------------------------------------------------------------|
+| `vhdlls.topEntity`  | Default top entity, in the form `library.entity` (e.g. `work.top`). Auto-loaded on startup. |
+
+This view requires a `vhdl_ls` build that implements the
+`vhdl/designHierarchy` and `vhdl/designHierarchyCandidates` requests
+(version 0.87 or newer, or any build from the `master` branch with
+hierarchy support). Older servers report "method not found" and the view
+will display a notice instead of a tree.
 
 ## Configuration
 The language server needs to know the library mapping of the VHDL files in the project, for this purpose it reads a configuration file in the [TOML](https://github.com/toml-lang/toml) format named `vhdl_ls.toml`.
