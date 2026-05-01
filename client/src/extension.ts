@@ -9,7 +9,25 @@ import * as fs from 'fs-extra';
 import { Octokit } from 'octokit';
 import * as path from 'path';
 import semver = require('semver');
-import { ExtensionContext, window, workspace, commands } from 'vscode';
+import {
+    ConfigurationTarget,
+    ExtensionContext,
+    EventEmitter,
+    Event,
+    QuickPickItem,
+    QuickPickItemKind,
+    Range,
+    Position,
+    ProviderResult,
+    ThemeIcon,
+    TreeDataProvider,
+    TreeItem,
+    TreeItemCollapsibleState,
+    Uri,
+    window,
+    workspace,
+    commands,
+} from 'vscode';
 import util = require('util');
 import * as lockfile from 'proper-lockfile';
 const exec = util.promisify(require('child_process').exec);
@@ -145,6 +163,41 @@ export async function activate(ctx: ExtensionContext) {
             await client.restart();
         })
     );
+
+    // Register design-hierarchy view + commands.
+    const hierarchyProvider = new HierarchyProvider(() => client, output);
+    ctx.subscriptions.push(
+        window.registerTreeDataProvider('vhdlHierarchy', hierarchyProvider)
+    );
+    const pickAndApply = async () => {
+        const top = await pickTopEntity(() => client, output);
+        if (top) {
+            hierarchyProvider.setTop(top);
+            void persistTopEntity(top, output);
+        }
+    };
+    ctx.subscriptions.push(
+        commands.registerCommand('vhdlls.showHierarchy', pickAndApply)
+    );
+    ctx.subscriptions.push(
+        commands.registerCommand('vhdlls.setHierarchyTop', pickAndApply)
+    );
+    ctx.subscriptions.push(
+        commands.registerCommand('vhdlls.refreshHierarchy', () => {
+            hierarchyProvider.refresh();
+        })
+    );
+
+    // If a default top entity is configured, load the hierarchy on startup.
+    const configuredTop = workspace
+        .getConfiguration()
+        .get<string>('vhdlls.topEntity');
+    if (configuredTop) {
+        const parsed = parseTopEntity(configuredTop);
+        if (parsed) {
+            hierarchyProvider.setTop(parsed);
+        }
+    }
 
     output.appendLine('Checking for updates...');
     lockfile
@@ -412,4 +465,411 @@ async function getLatestLanguageServer(
         });
     }
     return Promise.resolve();
+}
+
+// --- Design Hierarchy view ---
+
+import type { OutputChannel } from 'vscode';
+
+const HIERARCHY_REQUEST = 'vhdl/designHierarchy';
+const HIERARCHY_CANDIDATES_REQUEST = 'vhdl/designHierarchyCandidates';
+const LSP_METHOD_NOT_FOUND = -32601;
+
+interface TopEntity {
+    library: string;
+    entity: string;
+}
+
+// Matches what comes off the wire (lsp_types::Location serialized as JSON):
+// `uri` is a plain string, not a parsed vscode.Uri.
+interface LspLocation {
+    uri: string;
+    range: {
+        start: { line: number; character: number };
+        end: { line: number; character: number };
+    };
+}
+
+interface HierarchyResponseNode {
+    label: string | null;
+    entity: string;
+    architecture: string | null;
+    kind: string;
+    instanceLocation: LspLocation | null;
+    entityLocation: LspLocation | null;
+    notes: string[];
+    children: HierarchyResponseNode[];
+}
+
+interface HierarchyCandidate {
+    library: string;
+    entity: string;
+    depth: number;
+    instanceCount: number;
+    isRoot: boolean;
+    entityLocation: LspLocation | null;
+}
+
+interface CandidatesResponse {
+    candidates: HierarchyCandidate[];
+}
+
+type ClientGetter = () => LanguageClient;
+
+function isMethodNotFound(err: unknown): boolean {
+    return (
+        typeof err === 'object' &&
+        err !== null &&
+        (err as { code?: number }).code === LSP_METHOD_NOT_FOUND
+    );
+}
+
+function describeError(err: unknown, fallback: string): string {
+    if (typeof err === 'object' && err !== null) {
+        const e = err as { message?: string };
+        if (e.message) {
+            return e.message;
+        }
+    }
+    if (typeof err === 'string' && err) {
+        return err;
+    }
+    return fallback;
+}
+
+async function persistTopEntity(
+    top: TopEntity,
+    log: OutputChannel
+): Promise<void> {
+    const value = `${top.library}.${top.entity}`;
+    const cfg = workspace.getConfiguration();
+    const target = workspace.workspaceFolders
+        ? ConfigurationTarget.Workspace
+        : ConfigurationTarget.Global;
+    try {
+        await cfg.update('vhdlls.topEntity', value, target);
+    } catch (err) {
+        log.appendLine(`Could not persist vhdlls.topEntity: ${err}`);
+    }
+}
+
+function parseTopEntity(input: string): TopEntity | undefined {
+    const s = input.trim();
+    if (!s) {
+        return undefined;
+    }
+    const dot = s.indexOf('.');
+    if (dot < 0) {
+        return { library: 'work', entity: s };
+    }
+    const library = s.slice(0, dot).trim();
+    const entity = s.slice(dot + 1).trim();
+    if (!library || !entity) {
+        return undefined;
+    }
+    return { library, entity };
+}
+
+async function fetchCandidates(
+    getClient: ClientGetter,
+    log: OutputChannel
+): Promise<HierarchyCandidate[] | 'unsupported'> {
+    try {
+        const resp = await getClient().sendRequest<CandidatesResponse>(
+            HIERARCHY_CANDIDATES_REQUEST,
+            {}
+        );
+        return resp.candidates ?? [];
+    } catch (err) {
+        if (isMethodNotFound(err)) {
+            return 'unsupported';
+        }
+        log.appendLine(
+            `Failed to fetch hierarchy candidates: ${describeError(err, 'request failed')}`
+        );
+        return [];
+    }
+}
+
+interface CandidatePickItem extends QuickPickItem {
+    candidate?: TopEntity;
+    customInput?: boolean;
+}
+
+async function pickTopEntity(
+    getClient: ClientGetter,
+    log: OutputChannel
+): Promise<TopEntity | undefined> {
+    const current = workspace
+        .getConfiguration()
+        .get<string>('vhdlls.topEntity');
+
+    const fetched = await fetchCandidates(getClient, log);
+    const candidates = fetched === 'unsupported' ? [] : fetched;
+    if (fetched === 'unsupported') {
+        window.showWarningMessage(
+            'The active vhdl_ls does not support the hierarchy request. ' +
+                'Please update vhdl_ls or set vhdlls.languageServerUserPath ' +
+                'to a build that includes design-hierarchy support.'
+        );
+    }
+
+    const roots = candidates.filter((c) => c.isRoot);
+    const others = candidates.filter((c) => !c.isRoot);
+
+    const items: CandidatePickItem[] = [];
+    if (roots.length > 0) {
+        items.push({
+            label: 'Top candidates (no incoming instantiations)',
+            kind: QuickPickItemKind.Separator,
+        });
+        for (const c of roots) {
+            items.push(candidateItem(c));
+        }
+    }
+    if (others.length > 0) {
+        items.push({
+            label: 'Other entities',
+            kind: QuickPickItemKind.Separator,
+        });
+        for (const c of others) {
+            items.push(candidateItem(c));
+        }
+    }
+    items.push({
+        label: '$(edit) Type a custom entity name...',
+        description: 'library.entity',
+        customInput: true,
+    });
+
+    return new Promise<TopEntity | undefined>((resolve) => {
+        const qp = window.createQuickPick<CandidatePickItem>();
+        qp.title = 'Select top entity for design hierarchy';
+        qp.placeholder =
+            candidates.length === 0
+                ? 'No entities listed (project still analysing or unsupported). Type library.entity.'
+                : 'Pick a candidate, or type library.entity';
+        qp.matchOnDescription = true;
+        qp.matchOnDetail = true;
+        qp.items = items;
+        if (current) {
+            qp.value = current;
+        }
+        qp.ignoreFocusOut = true;
+
+        qp.onDidAccept(() => {
+            const picked = qp.selectedItems[0];
+            const typed = qp.value.trim();
+
+            let result: TopEntity | undefined;
+            if (picked && picked.candidate) {
+                result = picked.candidate;
+            } else if (picked && picked.customInput) {
+                result = parseTopEntity(typed);
+            } else if (typed) {
+                result = parseTopEntity(typed);
+            }
+            qp.hide();
+            resolve(result);
+        });
+        qp.onDidHide(() => {
+            qp.dispose();
+            resolve(undefined);
+        });
+        qp.show();
+    });
+}
+
+function candidateItem(c: HierarchyCandidate): CandidatePickItem {
+    const path = `${c.library}.${c.entity}`;
+    const icon = c.isRoot ? '$(symbol-class) ' : '$(symbol-module) ';
+    const description = `depth ${c.depth}, ${c.instanceCount} instance${
+        c.instanceCount === 1 ? '' : 's'
+    }`;
+    const detail = c.entityLocation
+        ? Uri.parse(c.entityLocation.uri).fsPath
+        : undefined;
+    return {
+        label: `${icon}${path}`,
+        description,
+        detail,
+        candidate: { library: c.library, entity: c.entity },
+    };
+}
+
+// --- Tree provider --------------------------------------------------------
+//
+// The tree shows two kinds of element: status messages (when there is no
+// hierarchy to render) and real instantiation nodes. They render
+// differently and have different child-iteration rules, so we model them as
+// a discriminated union rather than overload one class.
+
+type TreeElement =
+    | { kind: 'status'; label: string; command?: string }
+    | { kind: 'node'; node: HierarchyResponseNode };
+
+class HierarchyProvider implements TreeDataProvider<TreeElement> {
+    private top: TopEntity | undefined;
+    private root: HierarchyResponseNode | undefined;
+    private loadError: string | undefined;
+    private unsupported = false;
+    private loading = false;
+    private readonly emitter = new EventEmitter<TreeElement | undefined>();
+    readonly onDidChangeTreeData: Event<TreeElement | undefined> =
+        this.emitter.event;
+
+    constructor(
+        private readonly getClient: ClientGetter,
+        private readonly log: OutputChannel
+    ) {}
+
+    setTop(top: TopEntity): void {
+        this.top = top;
+        void this.reload();
+    }
+
+    refresh(): void {
+        if (this.top) {
+            void this.reload();
+        }
+    }
+
+    private async reload(): Promise<void> {
+        if (!this.top) {
+            return;
+        }
+        this.loading = true;
+        this.loadError = undefined;
+        this.unsupported = false;
+        this.root = undefined;
+        this.emitter.fire(undefined);
+        try {
+            this.root = await this.getClient().sendRequest<HierarchyResponseNode>(
+                HIERARCHY_REQUEST,
+                { library: this.top.library, entity: this.top.entity }
+            );
+        } catch (err) {
+            if (isMethodNotFound(err)) {
+                this.unsupported = true;
+            } else {
+                this.loadError = describeError(err, 'request failed');
+                this.log.appendLine(`Hierarchy request failed: ${this.loadError}`);
+            }
+        } finally {
+            this.loading = false;
+            this.emitter.fire(undefined);
+        }
+    }
+
+    getTreeItem(element: TreeElement): TreeItem {
+        return element.kind === 'status'
+            ? buildStatusItem(element.label, element.command)
+            : buildNodeItem(element.node);
+    }
+
+    getChildren(element?: TreeElement): ProviderResult<TreeElement[]> {
+        if (!element) {
+            return this.rootChildren();
+        }
+        if (element.kind === 'status') {
+            return [];
+        }
+        return element.node.children.map((node) => ({ kind: 'node', node } as TreeElement));
+    }
+
+    private rootChildren(): TreeElement[] {
+        if (this.unsupported) {
+            return [
+                {
+                    kind: 'status',
+                    label: 'vhdl_ls does not support design hierarchy. Update or point vhdlls.languageServerUserPath at a newer build.',
+                },
+            ];
+        }
+        if (!this.top) {
+            return [
+                {
+                    kind: 'status',
+                    label: 'Click to set top entity...',
+                    command: 'vhdlls.setHierarchyTop',
+                },
+            ];
+        }
+        if (this.loading) {
+            return [{ kind: 'status', label: 'Loading hierarchy...' }];
+        }
+        if (this.loadError) {
+            return [{ kind: 'status', label: `Error: ${this.loadError}` }];
+        }
+        if (!this.root) {
+            return [{ kind: 'status', label: 'No hierarchy loaded.' }];
+        }
+        return [{ kind: 'node', node: this.root }];
+    }
+}
+
+function buildStatusItem(label: string, command?: string): TreeItem {
+    const item = new TreeItem(label, TreeItemCollapsibleState.None);
+    item.contextValue = 'status';
+    if (command) {
+        item.command = { command, title: label };
+    }
+    return item;
+}
+
+function buildNodeItem(node: HierarchyResponseNode): TreeItem {
+    const primary = node.label ?? node.entity;
+    const collapsible =
+        node.children.length > 0
+            ? TreeItemCollapsibleState.Expanded
+            : TreeItemCollapsibleState.None;
+    const item = new TreeItem(primary, collapsible);
+
+    const arch = node.architecture ? `(${node.architecture})` : '';
+    item.description = `${node.entity}${arch}`;
+    item.tooltip =
+        (node.label ? `${node.label} : ` : '') +
+        `${node.entity}${arch}` +
+        (node.notes.length ? `\n# ${node.notes.join('\n# ')}` : '');
+    item.contextValue = node.kind;
+    item.iconPath = iconForKind(node.kind);
+
+    const target = node.instanceLocation ?? node.entityLocation;
+    if (target) {
+        item.command = {
+            command: 'vscode.open',
+            title: 'Open',
+            arguments: [
+                Uri.parse(target.uri),
+                {
+                    selection: new Range(
+                        new Position(
+                            target.range.start.line,
+                            target.range.start.character
+                        ),
+                        new Position(
+                            target.range.end.line,
+                            target.range.end.character
+                        )
+                    ),
+                },
+            ],
+        };
+    }
+    return item;
+}
+
+function iconForKind(kind: string): ThemeIcon {
+    switch (kind) {
+        case 'top':
+            return new ThemeIcon('symbol-class');
+        case 'unboundComponent':
+            return new ThemeIcon('warning');
+        case 'unresolved':
+            return new ThemeIcon('question');
+        case 'configuration':
+            return new ThemeIcon('symbol-misc');
+        default:
+            return new ThemeIcon('symbol-module');
+    }
 }
